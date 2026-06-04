@@ -29,13 +29,12 @@ export default function Home() {
               (n, u) => n + countCompleted(course.id, unitItemIds(u)),
               0,
             )
-            const firstUnit = course.units[0]
             return (
               <button
                 key={course.id}
                 className="course-card rise"
                 style={{ animationDelay: `${idx * 70}ms`, '--accent': `var(--${course.accent})` }}
-                onClick={() => navigate(`/curso/${course.id}/unidad/${firstUnit.id}`)}
+                onClick={() => navigate(`/curso/${course.id}`)}
               >
                 <div className="course-card__icon">{course.icon}</div>
                 <div className="course-card__body">

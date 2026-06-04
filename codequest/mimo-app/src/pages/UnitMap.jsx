@@ -41,7 +41,7 @@ export default function UnitMap() {
   return (
     <main className="container">
       <header className="unit__header rise">
-        <Link to="/" className="unit__back">‹ Cursos</Link>
+        <Link to={`/curso/${courseId}`} className="unit__back">‹ Unidades</Link>
         <div className="unit__heading" style={{ '--accent': `var(--${course.accent})` }}>
           <span className="unit__course">{course.icon} {course.title}</span>
           <h1 className="unit__title">{unit.title}</h1>
