@@ -10,6 +10,7 @@ import ExampleCard from '../components/learning/ExampleCard.jsx'
 import MiniQuestion from '../components/learning/MiniQuestion.jsx'
 import FeedbackBox from '../components/learning/FeedbackBox.jsx'
 import LessonNavigation from '../components/learning/LessonNavigation.jsx'
+import StepRenderer, { isInteractive } from '../components/learning/StepRenderer.jsx'
 import './LearningScreens.css'
 
 export default function BlockScreen() {
@@ -18,25 +19,30 @@ export default function BlockScreen() {
   const { completeItem, isCompleted, saveErrors } = useProgress()
 
   const course = getCourse(courseId)
-  const unit = getUnit(courseId, unitId)
-  const index = unit ? unit.items.findIndex((i) => i.id === itemId) : -1
-  const block = index >= 0 ? unit.items[index] : null
+  const unit   = getUnit(courseId, unitId)
+  const index  = unit ? unit.items.findIndex((i) => i.id === itemId) : -1
+  const block  = index >= 0 ? unit.items[index] : null
 
-  // Soporta ambos formatos: question (singular, legado) y questions (array, nuevo)
+  // ── Mode detection (priority order) ──────────────────────────────────────
+  const hasSteps = !!block?.steps
   const questions = block?.questions ?? (block?.question ? [block.question] : [])
-  const isMulti = !!block?.questions
+  const isMulti   = !hasSteps && !!block?.questions
 
-  // Estado compartido
+  // ── Shared state ──────────────────────────────────────────────────────────
   const [selected, setSelected] = useState(null)
-  const [checked, setChecked] = useState(false)
+  const [checked, setChecked]   = useState(false)
 
-  // Estado exclusivo del flujo multi-pregunta
-  const [queue, setQueue] = useState(() => questions.map((_, i) => i))
-  const [qPos, setQPos] = useState(0)
-  const [wrong, setWrong] = useState([])       // índices erróneos del round actual
+  // ── Queue-based state (shared by isMulti and hasSteps modes) ─────────────
+  const [queue, setQueue] = useState(() => {
+    if (block?.steps)     return block.steps.map((_, i) => i)
+    if (block?.questions) return block.questions.map((_, i) => i)
+    return []
+  })
+  const [qPos, setQPos]               = useState(0)
+  const [wrong, setWrong]             = useState([])
   const [totalErrors, setTotalErrors] = useState(0)
-  const [phase, setPhase] = useState('playing') // 'playing' | 'complete'
-  const [isReview, setIsReview] = useState(false)
+  const [phase, setPhase]             = useState('playing') // 'playing' | 'complete'
+  const [isReview, setIsReview]       = useState(false)
 
   if (!block || block.type !== 'block') {
     return (
@@ -47,19 +53,15 @@ export default function BlockScreen() {
   }
 
   const alreadyDone = isCompleted(courseId, block.id)
-  const unitPath = `/curso/${courseId}/unidad/${unitId}`
+  const unitPath    = `/curso/${courseId}/unidad/${unitId}`
 
-  // ── Flujo legado (question singular) ──────────────────────────────────────
-  const q = block.question
-  const isCorrect = !isMulti && q ? selected === q.correctIndex : false
+  // ── Active item helpers ───────────────────────────────────────────────────
+  const activeStep           = hasSteps  ? block.steps[queue[qPos]]  : null
+  const activeQ              = isMulti   ? questions[queue[qPos]]     : null
+  const isInteractiveStep    = hasSteps  && activeStep && isInteractive(activeStep)
+  const activeIsCorrect      = isMulti   && activeQ   ? selected === activeQ.correctIndex : false
 
-  function handleCheck() {
-    setChecked(true)
-    if (selected === q.correctIndex) {
-      completeItem(courseId, block.id, block.xp)
-    }
-  }
-
+  // ── Navigate to next item in the unit map ────────────────────────────────
   function goNext() {
     const next = unit.items[index + 1]
     if (!next) return navigate(unitPath)
@@ -72,10 +74,41 @@ export default function BlockScreen() {
     }
   }
 
-  // ── Flujo multi-pregunta ───────────────────────────────────────────────────
-  const activeQ = isMulti ? questions[queue[qPos]] : null
-  const activeIsCorrect = isMulti && activeQ ? selected === activeQ.correctIndex : false
+  // ── Shared queue advance (used by both hasSteps and isMulti modes) ────────
+  // Safe to read `wrong` here: handleCheck* fires on a prior render (separate
+  // button click), so React has already committed the setWrong update.
+  function handleAdvance() {
+    const nextPos = qPos + 1
+    if (nextPos < queue.length) {
+      setQPos(nextPos)
+      setSelected(null)
+      setChecked(false)
+    } else if (wrong.length > 0) {
+      setQueue([...wrong])
+      setQPos(0)
+      setWrong([])
+      setIsReview(true)
+      setSelected(null)
+      setChecked(false)
+    } else {
+      completeItem(courseId, block.id, block.xp)
+      saveErrors(courseId, block.id, totalErrors)
+      setPhase('complete')
+      setSelected(null)
+      setChecked(false)
+    }
+  }
 
+  // ── Steps mode: check interactive answer ─────────────────────────────────
+  function handleCheckSteps() {
+    setChecked(true)
+    if (selected !== activeStep.correctIndex) {
+      setWrong((prev) => [...prev, queue[qPos]])
+      setTotalErrors((prev) => prev + 1)
+    }
+  }
+
+  // ── Multi-question mode: check answer ────────────────────────────────────
   function handleCheckMulti() {
     setChecked(true)
     if (selected !== activeQ.correctIndex) {
@@ -84,30 +117,38 @@ export default function BlockScreen() {
     }
   }
 
-  // Llamado al pulsar "Siguiente →". Lee `wrong` del render en que se creó
-  // (después de que handleCheckMulti ya actualizó el estado en el render anterior).
-  function handleAdvance() {
-    const nextPos = qPos + 1
-    if (nextPos < queue.length) {
-      setQPos(nextPos)
-      setSelected(null)
-      setChecked(false)
-    } else if (wrong.length > 0) {
-      // Hay errores: reiniciar con solo las preguntas fallidas
-      setQueue([...wrong])
-      setQPos(0)
-      setWrong([])
-      setIsReview(true)
-      setSelected(null)
-      setChecked(false)
-    } else {
-      // Todas correctas: completar bloque
+  // ── Legacy single-question mode ───────────────────────────────────────────
+  const q         = block.question
+  const isCorrect = !isMulti && !hasSteps && q ? selected === q.correctIndex : false
+
+  function handleCheck() {
+    setChecked(true)
+    if (selected === q.correctIndex) {
       completeItem(courseId, block.id, block.xp)
-      saveErrors(courseId, block.id, totalErrors)
-      setPhase('complete')
-      setSelected(null)
-      setChecked(false)
     }
+  }
+
+  // ── Progress indicator text ───────────────────────────────────────────────
+  function progressLabel(total) {
+    const noun = hasSteps ? 'Paso' : 'Pregunta'
+    const base = isReview
+      ? `Repaso · ${qPos + 1} de ${queue.length}`
+      : `${noun} ${qPos + 1} de ${total}`
+    return totalErrors > 0
+      ? `${base} · ${totalErrors} error${totalErrors !== 1 ? 'es' : ''}`
+      : base
+  }
+
+  // ── Shared completion banner ──────────────────────────────────────────────
+  function completionBanner() {
+    return (
+      <div className="feedback feedback--ok" style={{ marginBottom: 16 }}>
+        <strong>¡Bloque completado! </strong>
+        {totalErrors === 0
+          ? 'Sin errores. Excelente dominio del tema.'
+          : `${totalErrors} error${totalErrors !== 1 ? 'es' : ''} durante el repaso.`}
+      </div>
+    )
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -117,29 +158,76 @@ export default function BlockScreen() {
 
       <article className="learn__card rise" style={{ '--accent': `var(--${course.accent})` }}>
         <LessonHeader tag={`Bloque · ${block.xp} XP`} title={block.title} />
-        <ExplanationCard text={block.explanation} />
-        {block.example && <ExampleCard code={block.example.code} caption={block.example.caption} />}
+
+        {/* Explanation + example only in legacy and multi modes — steps embed their own */}
+        {!hasSteps && block.explanation && <ExplanationCard text={block.explanation} />}
+        {!hasSteps && block.example && (
+          <ExampleCard code={block.example.code} caption={block.example.caption} />
+        )}
 
         <div className="quiz">
-          {isMulti ? (
+
+          {/* ── Steps mode ─────────────────────────────────── */}
+          {hasSteps ? (
             <>
               {phase !== 'complete' && (
                 <p className="learn__donenote faint" style={{ marginBottom: 10, textAlign: 'left' }}>
-                  {isReview
-                    ? `Repaso · ${qPos + 1} de ${queue.length}`
-                    : `Pregunta ${qPos + 1} de ${questions.length}`}
-                  {totalErrors > 0 && ` · ${totalErrors} error${totalErrors !== 1 ? 'es' : ''}`}
+                  {progressLabel(block.steps.length)}
                 </p>
               )}
 
-              {phase === 'complete' ? (
-                <div className="feedback feedback--ok" style={{ marginBottom: 16 }}>
-                  <strong>¡Bloque completado! </strong>
-                  {totalErrors === 0
-                    ? 'Sin errores. Excelente dominio del tema.'
-                    : `${totalErrors} error${totalErrors !== 1 ? 'es' : ''} cometido${totalErrors !== 1 ? 's' : ''} durante el repaso.`}
-                </div>
-              ) : (
+              {phase === 'complete' ? completionBanner() : (
+                <StepRenderer
+                  step={activeStep}
+                  selected={selected}
+                  checked={checked}
+                  onSelect={setSelected}
+                />
+              )}
+
+              <div className="learn__actions">
+                {phase === 'complete' ? (
+                  <Button variant="success" size="lg" full onClick={goNext}>
+                    Continuar →
+                  </Button>
+                ) : isInteractiveStep && !checked ? (
+                  <Button
+                    variant="primary" size="lg" full
+                    disabled={selected === null}
+                    onClick={handleCheckSteps}
+                  >
+                    Comprobar
+                  </Button>
+                ) : isInteractiveStep && checked ? (
+                  <Button
+                    variant={selected === activeStep.correctIndex ? 'primary' : 'soft'}
+                    size="lg" full
+                    onClick={handleAdvance}
+                  >
+                    Siguiente →
+                  </Button>
+                ) : (
+                  <Button variant="primary" size="lg" full onClick={handleAdvance}>
+                    Siguiente →
+                  </Button>
+                )}
+              </div>
+
+              {alreadyDone && phase !== 'complete' && !isReview && qPos === 0 && (
+                <p className="learn__donenote faint">Ya completaste este bloque. Puedes repasarlo.</p>
+              )}
+            </>
+
+          /* ── Multi-question mode ───────────────────────── */
+          ) : isMulti ? (
+            <>
+              {phase !== 'complete' && (
+                <p className="learn__donenote faint" style={{ marginBottom: 10, textAlign: 'left' }}>
+                  {progressLabel(questions.length)}
+                </p>
+              )}
+
+              {phase === 'complete' ? completionBanner() : (
                 <>
                   <MiniQuestion
                     question={activeQ}
@@ -163,9 +251,7 @@ export default function BlockScreen() {
                   </Button>
                 ) : !checked ? (
                   <Button
-                    variant="primary"
-                    size="lg"
-                    full
+                    variant="primary" size="lg" full
                     disabled={selected === null}
                     onClick={handleCheckMulti}
                   >
@@ -174,8 +260,7 @@ export default function BlockScreen() {
                 ) : (
                   <Button
                     variant={activeIsCorrect ? 'primary' : 'soft'}
-                    size="lg"
-                    full
+                    size="lg" full
                     onClick={handleAdvance}
                   >
                     Siguiente →
@@ -187,6 +272,8 @@ export default function BlockScreen() {
                 <p className="learn__donenote faint">Ya completaste este bloque. Puedes repasarlo.</p>
               )}
             </>
+
+          /* ── Legacy single-question mode ──────────────── */
           ) : (
             <>
               <MiniQuestion
@@ -212,6 +299,7 @@ export default function BlockScreen() {
               />
             </>
           )}
+
         </div>
       </article>
     </main>

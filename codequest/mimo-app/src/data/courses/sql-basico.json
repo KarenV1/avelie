@@ -16,244 +16,177 @@
           "type": "block",
           "id": "b1",
           "title": "¿Qué es SQL?",
-          "explanation": "SQL (Structured Query Language) es el lenguaje estándar para hablar con bases de datos relacionales. Con él pides datos, los filtras y los modificas escribiendo instrucciones llamadas consultas (queries).",
-          "example": {
-            "code": "-- Una consulta pide información a la base de datos\nSELECT * FROM usuarios;",
-            "caption": "Esta consulta pide todos los datos de la tabla usuarios."
-          },
-          "questions": [
+          "steps": [
             {
-              "format": "choice",
-              "context": null,
-              "prompt": "¿Qué significan las siglas SQL?",
-              "options": [
-                "Secure Query Language",
-                "Structured Query Language",
-                "Simple Question Language",
-                "Sequential Query Logic"
-              ],
-              "correctIndex": 1,
+              "type": "info",
+              "title": "¿Qué es una base de datos?",
+              "body": "Una base de datos es un sistema organizado para almacenar y recuperar información de forma estructurada. Los datos no se guardan en archivos sueltos: viven en tablas relacionadas entre sí. Oracle, MySQL y PostgreSQL son motores de bases de datos relacionales que usan SQL."
+            },
+            {
+              "type": "info",
+              "title": "¿Qué es una tabla (table)?",
+              "body": "Una tabla (table) es la unidad principal de almacenamiento en una base de datos relacional. Organiza la información en filas y columnas. Cada tabla representa una entidad del mundo real: clientes, productos, pedidos."
+            },
+            {
+              "type": "table_reading",
+              "table": "Tabla: clientes\n id | nombre  | ciudad\n----+---------+----------\n  1 | Ana     | CDMX\n  2 | Luis    | Monterrey\n  3 | Marta   | CDMX",
+              "prompt": "¿Cuántas columnas tiene esta tabla?",
+              "options": ["1", "2", "3", "4"],
+              "correctIndex": 2,
               "feedback": {
-                "correct": "Correcto. SQL = Structured Query Language: lenguaje estructurado de consulta.",
-                "incorrect": "SQL significa Structured Query Language: lenguaje estructurado de consulta."
+                "correct": "Correcto. Las columnas son: id, nombre y ciudad — 3 campos que describen cada cliente.",
+                "incorrect": "Las columnas son los encabezados: id, nombre y ciudad. Son 3."
               }
             },
             {
-              "format": "choice",
-              "context": null,
-              "prompt": "¿Para qué sirve principalmente SQL?",
+              "type": "multiple_choice",
+              "table": "Tabla: clientes\n id | nombre  | ciudad\n----+---------+----------\n  1 | Ana     | CDMX\n  2 | Luis    | Monterrey\n  3 | Marta   | CDMX",
+              "prompt": "En la tabla clientes, ¿qué representa el renglón con los datos de Ana?",
               "options": [
-                "Diseñar interfaces gráficas",
-                "Comunicarse con bases de datos relacionales",
-                "Editar archivos de imagen",
-                "Compilar código fuente"
-              ],
-              "correctIndex": 1,
-              "feedback": {
-                "correct": "Exacto. SQL es el idioma de las bases de datos relacionales.",
-                "incorrect": "SQL sirve para consultar y manipular datos en bases de datos relacionales."
-              }
-            },
-            {
-              "format": "choice",
-              "context": null,
-              "prompt": "¿Con qué tipo de base de datos trabaja SQL?",
-              "options": [
-                "Documental (como MongoDB)",
-                "Relacional (como Oracle o MySQL)",
-                "En grafo (como Neo4j)",
-                "Clave-valor (como Redis)"
-              ],
-              "correctIndex": 1,
-              "feedback": {
-                "correct": "Correcto. SQL es el lenguaje estándar de las bases de datos relacionales.",
-                "incorrect": "SQL trabaja con bases de datos relacionales: datos organizados en tablas con filas y columnas."
-              }
-            },
-            {
-              "format": "match",
-              "context": null,
-              "prompt": "El término inglés 'query' en español se llama:",
-              "options": [
-                "Tabla",
-                "Consulta",
-                "Columna",
-                "Registro"
-              ],
-              "correctIndex": 1,
-              "feedback": {
-                "correct": "Exacto. Query = consulta: la instrucción que le pides a la base de datos.",
-                "incorrect": "Query = consulta. Es la instrucción que escribes en SQL para pedir datos."
-              }
-            },
-            {
-              "format": "match",
-              "context": null,
-              "prompt": "El término inglés 'table' en español se llama:",
-              "options": [
-                "Columna",
-                "Fila",
-                "Tabla",
-                "Valor"
+                "Una columna",
+                "El nombre de la tabla",
+                "Una fila o registro (row)",
+                "Un valor en una celda"
               ],
               "correctIndex": 2,
               "feedback": {
-                "correct": "Correcto. Table = tabla: la estructura que organiza los datos en filas y columnas.",
-                "incorrect": "Table = tabla. En SQL, los datos se almacenan en tablas."
+                "correct": "Exacto. Cada renglón horizontal completo es una fila o registro (row).",
+                "incorrect": "Cada renglón horizontal de datos es una fila o registro (row). La columna es el campo vertical."
               }
             },
             {
-              "format": "match",
-              "context": null,
-              "prompt": "El término inglés 'row' en español se llama:",
+              "type": "multiple_choice",
+              "prompt": "¿Qué es una columna (column) en una tabla?",
               "options": [
-                "Columna o atributo",
-                "Fila o registro",
-                "Tabla",
-                "Consulta"
+                "Un registro completo de datos",
+                "Un campo vertical que describe una propiedad, como nombre o ciudad",
+                "El nombre de la base de datos",
+                "Una consulta SQL guardada"
               ],
               "correctIndex": 1,
               "feedback": {
-                "correct": "Correcto. Row = fila o registro: cada conjunto completo de datos en una tabla.",
-                "incorrect": "Row = fila o registro. Cada renglón horizontal de datos en una tabla es una fila."
+                "correct": "Correcto. Una columna (column) es un campo vertical que define una propiedad de la entidad.",
+                "incorrect": "La columna (column) es un campo vertical que define un tipo de dato, como nombre o ciudad."
               }
             },
             {
-              "format": "match",
-              "context": null,
-              "prompt": "El término inglés 'column' en español se llama:",
-              "options": [
-                "Fila o registro",
-                "Tabla",
-                "Consulta",
-                "Columna o atributo"
-              ],
-              "correctIndex": 3,
+              "type": "info",
+              "title": "Tabla, fila, columna y valor",
+              "body": "Tabla (table): la estructura completa. Fila o registro (row): un conjunto de datos que describe una entidad. Columna o atributo (column): una propiedad de esa entidad, como nombre o ciudad. Valor (value): el dato concreto en la celda donde fila y columna se cruzan, como 'CDMX'."
+            },
+            {
+              "type": "table_reading",
+              "table": "Tabla: clientes\n id | nombre  | ciudad\n----+---------+----------\n  1 | Ana     | CDMX\n  2 | Luis    | Monterrey\n  3 | Marta   | CDMX",
+              "prompt": "¿Cuál es el valor en la segunda fila, columna ciudad?",
+              "options": ["Ana", "CDMX", "Monterrey", "Luis"],
+              "correctIndex": 2,
               "feedback": {
-                "correct": "Correcto. Column = columna o atributo: el campo que define un tipo de dato.",
-                "incorrect": "Column = columna o atributo. Cada campo vertical de una tabla (id, nombre, edad) es una columna."
+                "correct": "Correcto. En la fila 2 (Luis), el valor de la columna ciudad es Monterrey.",
+                "incorrect": "Busca la segunda fila (Luis) y lee el valor en la columna ciudad: Monterrey."
               }
             },
             {
-              "format": "fill",
-              "context": null,
-              "prompt": "Una instrucción completa como `SELECT * FROM usuarios;` se llama ___ SQL.",
+              "type": "fill_blank",
+              "prompt": "En una tabla, cada renglón horizontal de datos es una ___.",
               "options": [
-                "una función de agregación",
-                "una sentencia (statement)",
-                "un procedimiento almacenado",
-                "un índice de búsqueda"
-              ],
-              "correctIndex": 1,
-              "feedback": {
-                "correct": "Correcto. La instrucción completa es una sentencia SQL o statement.",
-                "incorrect": "Se llama sentencia SQL (statement): es una instrucción completa y ejecutable."
-              }
-            },
-            {
-              "format": "identify",
-              "context": "SELECT * FROM empleados;",
-              "prompt": "¿Qué hace esta sentencia SQL?",
-              "options": [
-                "Elimina todos los registros de la tabla empleados",
-                "Devuelve todas las columnas y filas de la tabla empleados",
-                "Crea una tabla llamada empleados",
-                "Cuenta cuántos empleados hay"
+                "columna o atributo",
+                "fila o registro (row)",
+                "valor en una celda",
+                "sentencia SQL"
               ],
               "correctIndex": 1,
               "feedback": {
-                "correct": "Correcto. SELECT * devuelve todas las columnas; FROM empleados indica la tabla origen.",
-                "incorrect": "SELECT * FROM tabla: SELECT pide datos, * significa todas las columnas, FROM indica la tabla."
+                "correct": "Correcto. Cada renglón horizontal es una fila o registro (row).",
+                "incorrect": "El renglón horizontal con todos los datos de una entidad es la fila o registro (row)."
               }
             },
             {
-              "format": "identify",
-              "context": "SELECT nombre, edad FROM clientes;",
-              "prompt": "¿Qué parte de la sentencia indica de dónde se obtienen los datos?",
+              "type": "info",
+              "title": "¿Qué es SQL?",
+              "body": "SQL (Structured Query Language) es el lenguaje estándar para comunicarse con bases de datos relacionales. Con SQL puedes leer datos, filtrarlos, actualizarlos y eliminarlos. Una instrucción SQL completa se llama sentencia (statement). Oracle, MySQL y PostgreSQL usan SQL como lenguaje principal."
+            },
+            {
+              "type": "example",
+              "title": "Tu primera sentencia SQL",
+              "code": "SELECT *\nFROM clientes;",
+              "caption": "SELECT pide datos. El asterisco (*) significa todas las columnas. FROM clientes indica la tabla. Sin WHERE devuelve todas las filas."
+            },
+            {
+              "type": "multiple_choice",
+              "prompt": "¿Qué devuelve la sentencia SELECT * FROM clientes;?",
               "options": [
-                "SELECT nombre, edad",
+                "Solo la primera fila de clientes",
+                "Todas las columnas y todas las filas de la tabla clientes",
+                "Solo los nombres de las columnas",
+                "Elimina todos los registros de clientes"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. SELECT * trae todas las columnas; sin WHERE devuelve todas las filas.",
+                "incorrect": "SELECT * FROM tabla devuelve todas las columnas (*) y todas las filas de la tabla."
+              }
+            },
+            {
+              "type": "fill_blank",
+              "prompt": "En SELECT * FROM clientes;, el ___ indica de qué tabla se leen los datos.",
+              "options": [
+                "asterisco (*)",
                 "FROM clientes",
-                "El punto y coma al final",
-                "La coma entre nombre y edad"
+                "SELECT",
+                "punto y coma (;)"
               ],
               "correctIndex": 1,
               "feedback": {
                 "correct": "Correcto. FROM indica la tabla origen de los datos.",
-                "incorrect": "FROM clientes es la cláusula que indica la tabla de donde se leen los datos."
+                "incorrect": "FROM clientes es la cláusula que señala la tabla de donde se leen los datos."
               }
             },
             {
-              "format": "choice",
-              "context": null,
-              "prompt": "¿SQL es un lenguaje exclusivo de Oracle?",
+              "type": "code_choice",
+              "prompt": "¿Cuál de estas sentencias selecciona todos los datos de la tabla clientes?",
               "options": [
-                "Sí, Oracle inventó SQL y es el único que lo usa",
-                "No, SQL es un estándar internacional usado por Oracle, MySQL, PostgreSQL y otros",
-                "Sí, pero Oracle lo llamó PL/SQL",
-                "No, SQL solo existe en MySQL"
+                "DELETE FROM clientes;",
+                "SELECT * FROM clientes;",
+                "INSERT INTO clientes;",
+                "UPDATE clientes SET id = 1;"
               ],
               "correctIndex": 1,
               "feedback": {
-                "correct": "Correcto. SQL es un estándar ISO/ANSI que implementan casi todos los motores relacionales.",
-                "incorrect": "SQL es un estándar internacional (ISO/ANSI). Oracle, MySQL, SQL Server y PostgreSQL lo implementan."
+                "correct": "Correcto. SELECT * FROM clientes; lee todas las filas y columnas sin modificar nada.",
+                "incorrect": "SELECT * FROM tabla es la sentencia de lectura. DELETE, INSERT y UPDATE modifican datos."
               }
             },
             {
-              "format": "choice",
-              "context": null,
-              "prompt": "¿La sentencia SELECT modifica los datos almacenados en la tabla?",
-              "options": [
-                "Sí, SELECT actualiza los valores que encuentra",
-                "No, SELECT solo lee datos sin modificar nada",
-                "Sí, si usas SELECT * borra todos los registros",
-                "Depende de qué columnas selecciones"
-              ],
-              "correctIndex": 1,
-              "feedback": {
-                "correct": "Correcto. SELECT es una sentencia de lectura: no modifica, inserta ni elimina datos.",
-                "incorrect": "SELECT solo lee. Para modificar datos existen INSERT, UPDATE y DELETE."
-              }
-            },
-            {
-              "format": "error-spot",
-              "context": "SELEC * FROM clientes;",
+              "type": "debug",
+              "code": "SELEC * FROM clientes;",
               "prompt": "Esta sentencia tiene un error tipográfico. ¿Cuál es?",
               "options": [
-                "Falta un punto y coma al final",
-                "La palabra SELECT está mal escrita (falta la T)",
+                "Falta el punto y coma al final",
+                "La palabra SELECT está mal escrita — falta la T",
                 "FROM debería escribirse FORM",
                 "El asterisco (*) no es válido en SQL"
               ],
               "correctIndex": 1,
               "feedback": {
-                "correct": "Correcto. SELEC es un error tipográfico: debe ser SELECT (con T al final).",
-                "incorrect": "La palabra clave SELECT está escrita como SELEC — falta la T al final."
+                "correct": "Correcto. SELEC es un error tipográfico: la palabra clave es SELECT (con T al final).",
+                "incorrect": "La palabra clave SELECT está escrita como SELEC — le falta la T al final."
               }
             },
             {
-              "format": "read-table",
-              "context": "Tabla: productos\n id | nombre   | precio\n----+----------+-------\n  1 | Laptop   | 15000\n  2 | Mouse    |   350\n  3 | Teclado  |   800",
-              "prompt": "¿Cuántas columnas tiene esta tabla?",
-              "options": ["1", "2", "3", "4"],
-              "correctIndex": 2,
-              "feedback": {
-                "correct": "Correcto. La tabla tiene 3 columnas: id, nombre y precio.",
-                "incorrect": "Las columnas son los campos verticales: id, nombre y precio. Son 3."
-              }
-            },
-            {
-              "format": "read-table",
-              "context": "Tabla: productos\n id | nombre   | precio\n----+----------+-------\n  1 | Laptop   | 15000\n  2 | Mouse    |   350\n  3 | Teclado  |   800",
-              "prompt": "¿Cuántas filas (registros) tiene esta tabla?",
-              "options": ["1", "2", "3", "4"],
-              "correctIndex": 2,
-              "feedback": {
-                "correct": "Correcto. Hay 3 filas: Laptop, Mouse y Teclado.",
-                "incorrect": "Las filas son los registros horizontales de datos. Hay 3: Laptop, Mouse y Teclado."
-              }
+              "type": "summary",
+              "title": "Resumen — Lo que aprendiste",
+              "points": [
+                "Base de datos: sistema para almacenar datos en tablas relacionadas.",
+                "Tabla (table): estructura con filas y columnas que representa una entidad.",
+                "Fila o registro (row): un conjunto de datos que describe una entidad.",
+                "Columna o atributo (column): una propiedad de esa entidad.",
+                "Valor (value): el dato en la celda donde fila y columna se cruzan.",
+                "SQL es el lenguaje estándar para consultar bases de datos relacionales.",
+                "SELECT * FROM tabla; devuelve todas las columnas y filas de esa tabla."
+              ]
             }
           ],
-          "xp": 10
+          "xp": 40
         },
         {
           "type": "block",
