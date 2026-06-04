@@ -69,7 +69,7 @@
           "explanation": "La instrucción SELECT se usa para leer datos. SELECT * FROM tabla devuelve todas las columnas (*) de todas las filas de esa tabla.",
           "example": {
             "code": "SELECT * FROM usuarios;",
-            "caption": "El asterisco (*) significa “todas las columnas”."
+            "caption": "El asterisco (*) significa \"todas las columnas\"."
           },
           "question": {
             "prompt": "¿Qué devuelve SELECT * FROM productos;?",
@@ -147,12 +147,12 @@
             "caption": "Usuarios con más de 30 años."
           },
           "question": {
-            "prompt": "¿Qué operador significa “distinto de” en SQL?",
+            "prompt": "¿Qué operador significa \"distinto de\" en SQL?",
             "options": ["==", "<>", "!==", "><"],
             "correctIndex": 1,
             "feedback": {
               "correct": "¡Sí! <> (o !=) significa distinto.",
-              "incorrect": "En SQL “distinto de” se escribe <> (también se acepta !=)."
+              "incorrect": "En SQL \"distinto de\" se escribe <> (también se acepta !=)."
             }
           },
           "xp": 10
@@ -223,7 +223,7 @@
           "type": "block",
           "id": "b8",
           "title": "Limitar resultados con LIMIT",
-          "explanation": "LIMIT restringe cuántas filas devuelve la consulta. Es útil para ver una muestra o el “top N”.",
+          "explanation": "LIMIT restringe cuántas filas devuelve la consulta. Es útil para ver una muestra o el \"top N\".",
           "example": {
             "code": "SELECT nombre FROM usuarios\nORDER BY edad DESC\nLIMIT 3;",
             "caption": "Los 3 usuarios de mayor edad."
@@ -378,6 +378,761 @@
           ],
           "successMessage": "¡Excelente! Dominas la agregación con GROUP BY. 🚀",
           "failMessage": "Casi. Asegúrate de incluir COUNT(*) y GROUP BY pais.",
+          "xp": 60
+        }
+      ]
+    },
+    {
+      "id": "u2",
+      "title": "GROUP BY, HAVING y funciones de agregación",
+      "summary": "Agrupa resultados, aplica funciones de cálculo y filtra grupos.",
+      "items": [
+        {
+          "type": "block",
+          "id": "u2b1",
+          "title": "Agrupar filas con GROUP BY",
+          "explanation": "GROUP BY agrupa todas las filas que comparten el mismo valor en una columna. Sobre cada grupo puedes aplicar funciones como COUNT, SUM o AVG. Sin GROUP BY esas funciones operan sobre toda la tabla de una sola vez.",
+          "example": {
+            "code": "SELECT ciudad, COUNT(*) AS total\nFROM clientes\nGROUP BY ciudad;",
+            "caption": "Cuenta cuántos clientes hay en cada ciudad."
+          },
+          "question": {
+            "prompt": "¿Para qué sirve GROUP BY?",
+            "options": [
+              "Ordenar las filas de A a Z",
+              "Agrupar filas con el mismo valor para aplicar funciones de agregación",
+              "Filtrar filas que no cumplen una condición",
+              "Limitar el número máximo de resultados"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "Exacto. GROUP BY forma grupos y permite que COUNT, SUM, AVG operen por grupo.",
+              "incorrect": "No del todo: GROUP BY agrupa filas del mismo valor para que las funciones trabajen por grupo."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u2b2",
+          "title": "COUNT — contar filas",
+          "explanation": "COUNT(*) cuenta todas las filas de un grupo. COUNT(columna) cuenta solo las filas donde esa columna no es NULL. Es la función de agregación más usada en SQL.",
+          "example": {
+            "code": "-- Contar todos los pedidos\nSELECT COUNT(*) AS total_pedidos\nFROM pedidos;\n\n-- Contar por estado\nSELECT estado, COUNT(*) AS total\nFROM pedidos\nGROUP BY estado;",
+            "caption": "COUNT(*) devuelve el número de filas. Con GROUP BY, cuenta por cada grupo."
+          },
+          "question": {
+            "prompt": "¿Cuál es la diferencia entre COUNT(*) y COUNT(columna)?",
+            "options": [
+              "No hay diferencia",
+              "COUNT(*) cuenta todas las filas; COUNT(columna) excluye los NULL de esa columna",
+              "COUNT(*) solo funciona con números",
+              "COUNT(columna) es más lento"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "Correcto. COUNT(*) incluye NULL; COUNT(columna) los ignora.",
+              "incorrect": "La clave está en los NULL: COUNT(*) los cuenta, COUNT(columna) no."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u2b3",
+          "title": "SUM — sumar valores",
+          "explanation": "SUM(columna) suma todos los valores numéricos de una columna en un grupo. Combinada con GROUP BY obtienes el total por categoría, ciudad, mes o cualquier criterio que necesites.",
+          "example": {
+            "code": "SELECT categoria, SUM(precio) AS ingresos_total\nFROM pedidos\nGROUP BY categoria;",
+            "caption": "Suma los ingresos generados por cada categoría de producto."
+          },
+          "question": {
+            "prompt": "¿Qué devuelve SUM(precio) GROUP BY categoria?",
+            "options": [
+              "El precio más alto de cada categoría",
+              "El número de productos por categoría",
+              "La suma de precios de todos los pedidos de cada categoría",
+              "El promedio de precios por categoría"
+            ],
+            "correctIndex": 2,
+            "feedback": {
+              "correct": "Exacto. SUM suma todos los valores del grupo.",
+              "incorrect": "SUM acumula: suma todos los valores de precio dentro de cada grupo."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u2b4",
+          "title": "AVG — calcular el promedio",
+          "explanation": "AVG(columna) calcula el promedio aritmético de todos los valores no NULL de una columna. Es útil para comparar el rendimiento entre grupos: precio promedio, calificación media, duración típica.",
+          "example": {
+            "code": "SELECT departamento, AVG(salario) AS salario_promedio\nFROM empleados\nGROUP BY departamento;",
+            "caption": "Muestra el salario promedio de cada departamento."
+          },
+          "question": {
+            "prompt": "¿Qué ignora AVG al calcular el promedio?",
+            "options": [
+              "Los valores negativos",
+              "Los valores cero",
+              "Los valores NULL",
+              "Los valores duplicados"
+            ],
+            "correctIndex": 2,
+            "feedback": {
+              "correct": "Correcto. AVG descarta los NULL antes de calcular el promedio.",
+              "incorrect": "AVG ignora los NULL — solo promedia los valores que existen."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u2b5",
+          "title": "MIN y MAX — valores extremos",
+          "explanation": "MIN(columna) devuelve el valor más pequeño del grupo. MAX(columna) devuelve el más grande. Funcionan con números, fechas y texto. Combinados con GROUP BY te dan el extremo de cada grupo.",
+          "example": {
+            "code": "SELECT categoria,\n       MIN(precio) AS precio_minimo,\n       MAX(precio) AS precio_maximo\nFROM productos\nGROUP BY categoria;",
+            "caption": "Precio más bajo y más alto por categoría."
+          },
+          "question": {
+            "prompt": "¿Cuál es el resultado de MAX(fecha_registro) sobre una tabla de usuarios?",
+            "options": [
+              "La fecha de registro más antigua",
+              "El número total de registros",
+              "La fecha de registro más reciente",
+              "El promedio de fechas"
+            ],
+            "correctIndex": 2,
+            "feedback": {
+              "correct": "Exacto. MAX devuelve el valor más alto; en fechas, la más reciente.",
+              "incorrect": "MAX devuelve el mayor valor: en fechas, la más reciente."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u2b6",
+          "title": "Alias con AS",
+          "explanation": "AS le da un nombre legible a una columna calculada en el resultado. Sin alias, COUNT(*) aparece como 'COUNT(*)' en la cabecera. Con alias, aparece con el nombre que elijas. También puedes omitir AS y poner el alias directamente.",
+          "example": {
+            "code": "-- Con AS (recomendado)\nSELECT ciudad, COUNT(*) AS total_clientes\nFROM clientes\nGROUP BY ciudad;\n\n-- Sin AS (también válido)\nSELECT ciudad, COUNT(*) total_clientes\nFROM clientes\nGROUP BY ciudad;",
+            "caption": "AS renombra la columna en el resultado. Es especialmente útil con funciones de agregación."
+          },
+          "question": {
+            "prompt": "¿Qué hace AS en una consulta SQL?",
+            "options": [
+              "Crea una tabla nueva",
+              "Filtra filas por condición",
+              "Asigna un nombre temporal a una columna en el resultado",
+              "Ordena el resultado alfabéticamente"
+            ],
+            "correctIndex": 2,
+            "feedback": {
+              "correct": "Correcto. AS es solo un alias: no modifica datos, solo cambia el nombre en el resultado.",
+              "incorrect": "AS es un alias: renombra columnas en el resultado, sin crear ni filtrar nada."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "practice",
+          "id": "u2p1",
+          "title": "Ventas por categoría",
+          "scenario": "Una tienda en línea tiene la tabla pedidos (id, producto, categoria, cantidad, precio). El gerente quiere saber cuántos pedidos se registraron en cada categoría.",
+          "instructions": [
+            "Selecciona la columna categoria",
+            "Usa COUNT(*) con el alias total_pedidos",
+            "Trae los datos desde la tabla pedidos",
+            "Agrupa por categoria con GROUP BY"
+          ],
+          "initialCode": "SELECT \nFROM pedidos\nGROUP BY ;",
+          "validators": [
+            "select",
+            "count\\s*\\(",
+            "from\\s+pedidos",
+            "group\\s+by\\s+categoria"
+          ],
+          "mockOutput": {
+            "columns": ["categoria", "total_pedidos"],
+            "rows": [
+              ["Electrónica", "142"],
+              ["Ropa", "89"],
+              ["Hogar", "67"],
+              ["Deportes", "54"]
+            ]
+          },
+          "hints": [
+            "Pon categoria en SELECT y también al final en GROUP BY",
+            "Para contar escribe COUNT(*) AS total_pedidos"
+          ],
+          "successMessage": "¡Correcto! Ahora el gerente puede ver el volumen de pedidos por categoría.",
+          "failMessage": "Revisa que tengas: SELECT categoria, COUNT(*) AS total_pedidos, FROM pedidos, GROUP BY categoria.",
+          "xp": 40
+        },
+        {
+          "type": "block",
+          "id": "u2b7",
+          "title": "Filtrar grupos con HAVING",
+          "explanation": "HAVING filtra grupos después de que GROUP BY los forma. Es como un WHERE pero aplicado a grupos completos, no a filas individuales. Solo puedes usarlo junto con GROUP BY.",
+          "example": {
+            "code": "SELECT ciudad, COUNT(*) AS total\nFROM clientes\nGROUP BY ciudad\nHAVING COUNT(*) > 10;",
+            "caption": "Solo muestra las ciudades con más de 10 clientes."
+          },
+          "question": {
+            "prompt": "¿Cuándo se aplica HAVING?",
+            "options": [
+              "Antes de GROUP BY, para filtrar filas",
+              "Después de GROUP BY, para filtrar grupos",
+              "En lugar de WHERE cuando usas JOINs",
+              "Solo cuando la tabla tiene más de 100 filas"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "Exacto. HAVING actúa sobre los grupos ya formados por GROUP BY.",
+              "incorrect": "HAVING viene después de GROUP BY y filtra grupos, no filas individuales."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u2b8",
+          "title": "HAVING vs WHERE — diferencia clave",
+          "explanation": "WHERE filtra filas antes de agrupar. HAVING filtra grupos después de agrupar. No puedes usar funciones de agregación en WHERE. Si necesitas filtrar por COUNT o SUM, usa HAVING.",
+          "example": {
+            "code": "SELECT departamento, COUNT(*) AS total\nFROM empleados\nWHERE activo = 1\nGROUP BY departamento\nHAVING COUNT(*) >= 5;",
+            "caption": "WHERE excluye empleados inactivos. HAVING excluye departamentos con menos de 5 activos."
+          },
+          "question": {
+            "prompt": "¿Dónde escribirías la condición para mostrar solo categorías con más de 100 ventas?",
+            "options": [
+              "En WHERE",
+              "En HAVING",
+              "En ORDER BY",
+              "En SELECT"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "Correcto. HAVING filtra sobre resultados de agregación como COUNT.",
+              "incorrect": "Necesitas HAVING: WHERE no puede evaluar COUNT(*) porque actúa antes de que se formen los grupos."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u2b9",
+          "title": "Múltiples funciones en una consulta",
+          "explanation": "Puedes combinar COUNT, SUM, AVG, MIN y MAX en una sola consulta. Cada función opera sobre su columna dentro del mismo grupo. Esto te da un resumen completo con una sola consulta.",
+          "example": {
+            "code": "SELECT categoria,\n       COUNT(*)    AS pedidos,\n       SUM(total)  AS ingresos,\n       AVG(total)  AS ticket_promedio,\n       MIN(total)  AS pedido_minimo,\n       MAX(total)  AS pedido_maximo\nFROM pedidos\nGROUP BY categoria;",
+            "caption": "Un resumen completo de cada categoría en una sola consulta."
+          },
+          "question": {
+            "prompt": "¿Puedes usar COUNT, SUM y AVG juntos en la misma consulta con GROUP BY?",
+            "options": [
+              "No, solo puedes usar una función por consulta",
+              "Sí, cada función opera sobre su columna dentro del mismo grupo",
+              "Solo si las columnas son del mismo tipo",
+              "Solo en tablas con menos de 10 columnas"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "Exacto. Cada función es independiente y opera sobre su columna en el grupo.",
+              "incorrect": "Sí puedes: COUNT, SUM, AVG, MIN y MAX son independientes entre sí en la misma consulta."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u2b10",
+          "title": "GROUP BY con varias columnas",
+          "explanation": "Puedes agrupar por más de una columna separándolas con comas. El grupo se forma por la combinación única de todos los valores. Así obtienes resúmenes más específicos, como ventas por país Y categoría.",
+          "example": {
+            "code": "SELECT pais, categoria, COUNT(*) AS total\nFROM pedidos\nGROUP BY pais, categoria;",
+            "caption": "Cuenta los pedidos para cada combinación de país y categoría."
+          },
+          "question": {
+            "prompt": "Si agrupas por (pais, categoria), ¿cuántos grupos distintos puede haber?",
+            "options": [
+              "El número de países en la tabla",
+              "El número de categorías en la tabla",
+              "Todas las combinaciones únicas de país + categoría que existan en los datos",
+              "Siempre exactamente dos grupos"
+            ],
+            "correctIndex": 2,
+            "feedback": {
+              "correct": "Correcto. Un grupo por cada par (país, categoría) que aparezca en los datos.",
+              "incorrect": "Cada combinación única de los dos valores forma un grupo."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u2b11",
+          "title": "DISTINCT — eliminar duplicados",
+          "explanation": "SELECT DISTINCT elimina filas duplicadas del resultado. También puedes usar COUNT(DISTINCT columna) para contar valores únicos dentro de un grupo. Es útil cuando necesitas saber cuántos valores diferentes hay.",
+          "example": {
+            "code": "-- Ver países únicos\nSELECT DISTINCT pais FROM clientes;\n\n-- Contar países únicos por vendedor\nSELECT vendedor_id,\n       COUNT(DISTINCT pais) AS paises_distintos\nFROM pedidos\nGROUP BY vendedor_id;",
+            "caption": "DISTINCT elimina repetidos en el resultado o dentro de COUNT."
+          },
+          "question": {
+            "prompt": "¿Qué devuelve COUNT(DISTINCT ciudad)?",
+            "options": [
+              "El número total de filas",
+              "El número de ciudades únicas, sin contar repetidas",
+              "El nombre de cada ciudad una sola vez",
+              "El número de filas donde ciudad no es NULL"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "Exacto. DISTINCT dentro de COUNT cuenta cada valor solo una vez.",
+              "incorrect": "COUNT(DISTINCT ciudad) cuenta cuántas ciudades diferentes hay, ignorando las repetidas."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u2b12",
+          "title": "NULL en agregaciones",
+          "explanation": "Las funciones SUM, AVG, MIN y MAX ignoran automáticamente los NULL. COUNT(*) sí los cuenta (cuenta filas), pero COUNT(columna) los ignora. Conocer este comportamiento evita resultados incorrectos en reportes.",
+          "example": {
+            "code": "-- Si 3 de 5 notas son NULL:\nSELECT COUNT(*)    AS total_filas,     -- 5\n       COUNT(nota) AS notas_con_valor,  -- 2\n       AVG(nota)   AS promedio_real     -- (suma de 2 notas) / 2\nFROM calificaciones;",
+            "caption": "COUNT(*) cuenta todas las filas. COUNT(nota) y AVG(nota) ignoran los NULL."
+          },
+          "question": {
+            "prompt": "Una columna tiene: 10, NULL, 20, NULL, 30. ¿Cuánto devuelve AVG(columna)?",
+            "options": [
+              "12 — suma 60 ÷ 5 filas",
+              "20 — suma 60 ÷ 3 valores no NULL",
+              "NULL porque hay valores nulos",
+              "30 porque es el valor máximo"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "Correcto. AVG ignora los NULL: suma 60 y divide entre 3.",
+              "incorrect": "AVG ignora los NULL. Suma 10+20+30=60 y divide entre 3 valores válidos: resultado 20."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "practice",
+          "id": "u2p2",
+          "title": "Ciudades con más clientes",
+          "scenario": "El equipo de expansión necesita identificar las ciudades con mayor base de clientes. La tabla clientes (id, nombre, ciudad, pais) contiene registros de varios países. Solo quieren ver las ciudades con más de 5 clientes registrados.",
+          "instructions": [
+            "Selecciona ciudad y COUNT(*) con el alias total",
+            "Usa la tabla clientes",
+            "Agrupa por ciudad con GROUP BY",
+            "Filtra los grupos con HAVING COUNT(*) > 5"
+          ],
+          "initialCode": "SELECT ciudad, \nFROM clientes\nGROUP BY ciudad\nHAVING ;",
+          "validators": [
+            "select",
+            "count\\s*\\(",
+            "from\\s+clientes",
+            "group\\s+by\\s+ciudad",
+            "having"
+          ],
+          "mockOutput": {
+            "columns": ["ciudad", "total"],
+            "rows": [
+              ["Ciudad de México", "34"],
+              ["Guadalajara", "18"],
+              ["Monterrey", "12"],
+              ["Bogotá", "9"],
+              ["Buenos Aires", "8"]
+            ]
+          },
+          "hints": [
+            "El alias puede ser: COUNT(*) AS total",
+            "HAVING va después de GROUP BY y acepta condiciones sobre funciones de agregación como COUNT(*) > 5"
+          ],
+          "successMessage": "¡Correcto! Solo aparecen las ciudades con más de 5 clientes.",
+          "failMessage": "Verifica que tengas GROUP BY ciudad y HAVING COUNT(*) > 5.",
+          "xp": 60
+        }
+      ]
+    },
+    {
+      "id": "u3",
+      "title": "JOINs, subconsultas y vistas",
+      "summary": "Combina tablas, anida consultas y encapsula lógica reutilizable.",
+      "items": [
+        {
+          "type": "block",
+          "id": "u3b1",
+          "title": "¿Qué es un JOIN?",
+          "explanation": "Un JOIN combina filas de dos o más tablas usando una columna en común. En lugar de duplicar datos, las bases de datos relacionales distribuyen la información y la unen con JOIN cuando la necesitas.",
+          "example": {
+            "code": "-- Tabla pedidos: id, cliente_id, total\n-- Tabla clientes: id, nombre, ciudad\n\nSELECT pedidos.id, clientes.nombre, pedidos.total\nFROM pedidos\nJOIN clientes ON pedidos.cliente_id = clientes.id;",
+            "caption": "JOIN une pedidos con clientes usando la columna compartida cliente_id / id."
+          },
+          "question": {
+            "prompt": "¿Para qué sirve un JOIN?",
+            "options": [
+              "Para eliminar filas duplicadas de una tabla",
+              "Para combinar datos de dos o más tablas usando una columna en común",
+              "Para crear una tabla nueva con datos calculados",
+              "Para filtrar filas según un rango de fechas"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "Exacto. JOIN enlaza tablas por una columna compartida, evitando duplicar datos.",
+              "incorrect": "JOIN combina tablas: une las filas de una con las filas de otra usando una columna en común."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u3b2",
+          "title": "INNER JOIN — solo coincidencias",
+          "explanation": "INNER JOIN (o simplemente JOIN) devuelve solo las filas que tienen coincidencia en ambas tablas. Si un pedido no tiene cliente registrado, esa fila no aparece. Es el tipo de JOIN más común.",
+          "example": {
+            "code": "SELECT p.id AS pedido,\n       c.nombre AS cliente,\n       p.total\nFROM pedidos p\nINNER JOIN clientes c ON p.cliente_id = c.id;",
+            "caption": "Solo muestra pedidos que tienen un cliente registrado en la tabla clientes."
+          },
+          "question": {
+            "prompt": "Si un pedido tiene cliente_id = 99 pero no existe ningún cliente con id = 99, ¿aparece en el INNER JOIN?",
+            "options": [
+              "Sí, aparece con NULL en los campos del cliente",
+              "No, INNER JOIN solo incluye filas con coincidencia en ambas tablas",
+              "Sí, siempre aparecen todos los pedidos",
+              "Depende del ORDER BY"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "Correcto. INNER JOIN descarta las filas sin coincidencia.",
+              "incorrect": "INNER JOIN es estricto: si no hay coincidencia en ambas tablas, la fila no aparece."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u3b3",
+          "title": "LEFT JOIN — todos los de la izquierda",
+          "explanation": "LEFT JOIN devuelve todas las filas de la tabla izquierda aunque no haya coincidencia en la tabla derecha. Donde no hay coincidencia, las columnas de la tabla derecha aparecen como NULL. Útil para encontrar registros sin relación.",
+          "example": {
+            "code": "SELECT c.nombre, p.total\nFROM clientes c\nLEFT JOIN pedidos p ON c.id = p.cliente_id;",
+            "caption": "Muestra todos los clientes. Los que no tienen pedidos aparecen con NULL en total."
+          },
+          "question": {
+            "prompt": "¿Qué aparece en las columnas de la tabla derecha cuando LEFT JOIN no encuentra coincidencia?",
+            "options": [
+              "El valor 0",
+              "Una cadena vacía",
+              "NULL",
+              "La fila no aparece"
+            ],
+            "correctIndex": 2,
+            "feedback": {
+              "correct": "Correcto. Sin coincidencia, LEFT JOIN rellena con NULL las columnas de la tabla derecha.",
+              "incorrect": "LEFT JOIN rellena con NULL cuando no hay coincidencia en la tabla derecha."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u3b4",
+          "title": "RIGHT JOIN — todos los de la derecha",
+          "explanation": "RIGHT JOIN es el espejo de LEFT JOIN: devuelve todas las filas de la tabla derecha aunque no haya coincidencia en la izquierda. En la práctica muchos equipos prefieren reescribirlo como LEFT JOIN cambiando el orden de las tablas.",
+          "example": {
+            "code": "-- Todos los pedidos, aunque no tengan cliente registrado\nSELECT c.nombre, p.id AS pedido, p.total\nFROM clientes c\nRIGHT JOIN pedidos p ON c.id = p.cliente_id;",
+            "caption": "Todos los pedidos aparecen. Si el cliente no existe, nombre es NULL."
+          },
+          "question": {
+            "prompt": "¿Cuál es la diferencia principal entre LEFT JOIN y RIGHT JOIN?",
+            "options": [
+              "LEFT JOIN es más rápido",
+              "LEFT JOIN conserva todas las filas de la tabla izquierda; RIGHT JOIN las de la derecha",
+              "RIGHT JOIN solo funciona con fechas",
+              "No hay diferencia, son equivalentes en todos los casos"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "Correcto. La diferencia es qué tabla conserva todas sus filas.",
+              "incorrect": "La dirección importa: LEFT conserva la tabla izquierda completa, RIGHT conserva la derecha."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u3b5",
+          "title": "Alias de tabla",
+          "explanation": "Cuando haces JOIN, los nombres de tabla se vuelven largos de escribir. Un alias abrevia la referencia. Se define justo después del nombre de la tabla, con o sin AS. Es especialmente útil cuando unes la misma tabla consigo misma.",
+          "example": {
+            "code": "-- Sin alias (verbose)\nSELECT clientes.nombre, pedidos.total\nFROM clientes\nJOIN pedidos ON clientes.id = pedidos.cliente_id;\n\n-- Con alias (limpio)\nSELECT c.nombre, p.total\nFROM clientes c\nJOIN pedidos p ON c.id = p.cliente_id;",
+            "caption": "c y p son alias. El código queda más corto y legible."
+          },
+          "question": {
+            "prompt": "¿Un alias de tabla modifica la tabla original en la base de datos?",
+            "options": [
+              "Sí, la renombra permanentemente",
+              "No, solo es una abreviación temporal para esa consulta",
+              "Solo si usas AS explícito",
+              "Sí, pero se revierte al terminar la sesión"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "Correcto. El alias es temporal: solo existe durante la ejecución de esa consulta.",
+              "incorrect": "Los alias son temporales: existen solo para la consulta en la que los defines."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u3b6",
+          "title": "JOIN con más de dos tablas",
+          "explanation": "Puedes encadenar varios JOIN en una sola consulta. Cada JOIN agrega una tabla nueva usando la condición ON que la conecta. La regla general es: para unir N tablas necesitas N-1 JOINs.",
+          "example": {
+            "code": "SELECT p.id,\n       c.nombre  AS cliente,\n       pr.nombre AS producto,\n       p.cantidad\nFROM pedidos p\nJOIN clientes  c  ON p.cliente_id  = c.id\nJOIN productos pr ON p.producto_id = pr.id;",
+            "caption": "Une tres tablas: pedidos con clientes y con productos."
+          },
+          "question": {
+            "prompt": "¿Cuántos JOIN necesitas para unir 4 tablas en una sola consulta?",
+            "options": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "correctIndex": 2,
+            "feedback": {
+              "correct": "Correcto. Para N tablas necesitas N-1 JOINs.",
+              "incorrect": "La regla es N-1 JOINs para N tablas: con 4 tablas necesitas 3 JOINs."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "practice",
+          "id": "u3p1",
+          "title": "Pedidos con nombre de cliente",
+          "scenario": "Tienes dos tablas: clientes (id, nombre, ciudad) y pedidos (id, cliente_id, total). El equipo de ventas quiere ver cada pedido junto con el nombre del cliente que lo realizó. Solo los pedidos con cliente registrado.",
+          "instructions": [
+            "Selecciona p.id, c.nombre y p.total",
+            "La tabla base es pedidos con alias p",
+            "Usa INNER JOIN con clientes con alias c",
+            "Une donde p.cliente_id = c.id"
+          ],
+          "initialCode": "SELECT p.id, c.nombre, p.total\nFROM pedidos p\nJOIN clientes c ON ;",
+          "validators": [
+            "select",
+            "from\\s+pedidos",
+            "join\\s+clientes",
+            "p\\.cliente_id\\s*=\\s*c\\.id"
+          ],
+          "mockOutput": {
+            "columns": ["id", "nombre", "total"],
+            "rows": [
+              ["1001", "Ana García", "1250.00"],
+              ["1002", "Carlos Ruiz", "890.50"],
+              ["1003", "Ana García", "340.00"],
+              ["1004", "María López", "2100.75"]
+            ]
+          },
+          "hints": [
+            "La condición ON conecta las dos tablas: p.cliente_id = c.id",
+            "INNER JOIN se puede escribir solo como JOIN"
+          ],
+          "successMessage": "¡Excelente! Ahora ventas puede ver el nombre del cliente en cada pedido.",
+          "failMessage": "Revisa la condición ON: debe conectar p.cliente_id con c.id.",
+          "xp": 40
+        },
+        {
+          "type": "block",
+          "id": "u3b7",
+          "title": "¿Qué es una subconsulta?",
+          "explanation": "Una subconsulta (subquery) es una consulta SELECT dentro de otra consulta. El motor ejecuta primero la subconsulta y usa su resultado en la consulta principal. Puedes ponerlas en WHERE, FROM o SELECT.",
+          "example": {
+            "code": "-- La subconsulta calcula el promedio;\n-- la consulta principal filtra con él\nSELECT nombre, salario\nFROM empleados\nWHERE salario > (SELECT AVG(salario) FROM empleados);",
+            "caption": "Primero se calcula el promedio, luego se filtran los salarios contra ese valor."
+          },
+          "question": {
+            "prompt": "¿En qué orden ejecuta SQL una subconsulta?",
+            "options": [
+              "Primero la consulta externa, luego la interna",
+              "Primero la subconsulta (interna), luego la consulta principal (externa)",
+              "Las dos al mismo tiempo",
+              "Depende del ORDER BY"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "Correcto. La subconsulta se evalúa primero y su resultado alimenta la consulta externa.",
+              "incorrect": "SQL evalúa primero la subconsulta y luego usa ese resultado en la consulta principal."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u3b8",
+          "title": "Subconsulta en WHERE",
+          "explanation": "La subconsulta más común va en WHERE con IN, = , > o <. Con IN comparas contra una lista de valores; con = cuando la subconsulta devuelve un solo valor. El resultado de la subconsulta se usa como condición de filtro.",
+          "example": {
+            "code": "-- Con IN: varios valores posibles\nSELECT nombre\nFROM clientes\nWHERE id IN (SELECT cliente_id FROM pedidos WHERE total > 1000);\n\n-- Con =: un solo valor\nSELECT nombre, salario\nFROM empleados\nWHERE salario = (SELECT MAX(salario) FROM empleados);",
+            "caption": "IN acepta múltiples valores; = exige que la subconsulta devuelva exactamente uno."
+          },
+          "question": {
+            "prompt": "¿Cuándo usarías IN en lugar de = con una subconsulta?",
+            "options": [
+              "Cuando la subconsulta devuelve un único valor",
+              "Cuando la subconsulta puede devolver más de un valor",
+              "Nunca, = siempre es suficiente",
+              "Solo con tablas que tienen más de 1000 filas"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "Exacto. IN maneja múltiples resultados; = fallaría si la subconsulta devuelve más de uno.",
+              "incorrect": "Usa IN cuando la subconsulta puede devolver una lista de valores, no solo uno."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u3b9",
+          "title": "Subconsulta en FROM",
+          "explanation": "Una subconsulta en FROM actúa como una tabla temporal, también llamada tabla derivada. La consulta externa puede hacer SELECT, WHERE o GROUP BY sobre ella. Siempre debe tener un alias.",
+          "example": {
+            "code": "SELECT ciudad, promedio\nFROM (\n  SELECT ciudad, AVG(total) AS promedio\n  FROM pedidos\n  GROUP BY ciudad\n) AS resumen\nWHERE promedio > 500;",
+            "caption": "La subconsulta genera un resumen por ciudad; la consulta externa filtra las que superan 500."
+          },
+          "question": {
+            "prompt": "¿Qué nombre recibe una subconsulta usada en la cláusula FROM?",
+            "options": [
+              "Vista temporal",
+              "Tabla derivada",
+              "Función de agregación",
+              "Índice secundario"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "Correcto. Una subconsulta en FROM se llama tabla derivada.",
+              "incorrect": "Se llama tabla derivada: actúa como tabla temporal solo durante esa consulta."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u3b10",
+          "title": "EXISTS y NOT EXISTS",
+          "explanation": "EXISTS devuelve verdadero si la subconsulta produce al menos una fila. NOT EXISTS devuelve verdadero si no produce ninguna. Son muy eficientes para comprobar existencia sin traer todos los datos.",
+          "example": {
+            "code": "-- Clientes que sí tienen pedidos\nSELECT nombre FROM clientes c\nWHERE EXISTS (\n  SELECT 1 FROM pedidos p\n  WHERE p.cliente_id = c.id\n);\n\n-- Clientes sin ningún pedido\nSELECT nombre FROM clientes c\nWHERE NOT EXISTS (\n  SELECT 1 FROM pedidos p\n  WHERE p.cliente_id = c.id\n);",
+            "caption": "SELECT 1 es convención: solo importa si existe al menos una fila, no su contenido."
+          },
+          "question": {
+            "prompt": "¿Qué devuelve NOT EXISTS si la subconsulta encuentra al menos una fila?",
+            "options": [
+              "Verdadero",
+              "Falso",
+              "NULL",
+              "El número de filas encontradas"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "Correcto. NOT EXISTS es falso cuando la subconsulta sí encuentra filas.",
+              "incorrect": "NOT EXISTS: si la subconsulta encuentra algo, la condición es falsa y la fila se excluye."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u3b11",
+          "title": "¿Qué es una vista (VIEW)?",
+          "explanation": "Una VIEW es una consulta guardada con nombre. No almacena datos: cada vez que la consultas, ejecuta el SELECT subyacente. Sirve para simplificar consultas complejas, reutilizar lógica y controlar qué columnas ve cada usuario.",
+          "example": {
+            "code": "-- Crear la vista\nCREATE VIEW pedidos_grandes AS\nSELECT p.id, c.nombre, p.total\nFROM pedidos p\nJOIN clientes c ON p.cliente_id = c.id\nWHERE p.total > 1000;\n\n-- Usarla como si fuera una tabla\nSELECT * FROM pedidos_grandes;",
+            "caption": "pedidos_grandes es una vista. SELECT * FROM pedidos_grandes ejecuta el JOIN internamente."
+          },
+          "question": {
+            "prompt": "¿Una VIEW almacena una copia de los datos?",
+            "options": [
+              "Sí, guarda los datos en disco al crearla",
+              "No, es solo una consulta guardada que se ejecuta cada vez que la consultas",
+              "Sí, pero se actualiza cada 24 horas",
+              "Depende del motor de base de datos"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "Correcto. Una VIEW es una consulta con nombre, no una copia de los datos.",
+              "incorrect": "Una VIEW no guarda datos: es una consulta almacenada que se ejecuta en tiempo real."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "u3b12",
+          "title": "Crear y consultar una VIEW",
+          "explanation": "CREATE VIEW nombre AS SELECT... define la vista. Una vez creada, puedes hacer SELECT, WHERE, GROUP BY y JOIN sobre ella exactamente igual que con una tabla. Para eliminarla usas DROP VIEW nombre.",
+          "example": {
+            "code": "-- Crear\nCREATE VIEW resumen_ventas AS\nSELECT categoria,\n       COUNT(*)   AS pedidos,\n       SUM(total) AS ingresos\nFROM pedidos\nGROUP BY categoria;\n\n-- Consultar\nSELECT * FROM resumen_ventas\nWHERE ingresos > 5000\nORDER BY ingresos DESC;\n\n-- Eliminar\nDROP VIEW resumen_ventas;",
+            "caption": "La vista encapsula el GROUP BY. La consulta externa la usa como una tabla simple."
+          },
+          "question": {
+            "prompt": "¿Qué comando elimina una vista existente?",
+            "options": [
+              "DELETE VIEW nombre",
+              "REMOVE VIEW nombre",
+              "DROP VIEW nombre",
+              "TRUNCATE VIEW nombre"
+            ],
+            "correctIndex": 2,
+            "feedback": {
+              "correct": "Correcto. DROP VIEW nombre elimina la vista de la base de datos.",
+              "incorrect": "El comando correcto es DROP VIEW nombre."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "practice",
+          "id": "u3p2",
+          "title": "Clientes sin pedidos",
+          "scenario": "El equipo de marketing quiere identificar clientes inactivos para una campaña de reactivación. Tienes clientes (id, nombre, ciudad) y pedidos (id, cliente_id, total). Necesitas el nombre de todos los clientes que no han hecho ningún pedido.",
+          "instructions": [
+            "Selecciona c.nombre desde la tabla clientes con alias c",
+            "Usa NOT EXISTS para verificar que no existan pedidos del cliente",
+            "La subconsulta busca en pedidos (alias p) donde p.cliente_id = c.id",
+            "No necesitas JOIN: NOT EXISTS es suficiente"
+          ],
+          "initialCode": "SELECT c.nombre\nFROM clientes c\nWHERE NOT EXISTS (\n  SELECT 1\n  FROM pedidos p\n  WHERE \n);",
+          "validators": [
+            "select",
+            "from\\s+clientes",
+            "not\\s+exists",
+            "p\\.cliente_id\\s*=\\s*c\\.id"
+          ],
+          "mockOutput": {
+            "columns": ["nombre"],
+            "rows": [
+              ["Roberto Sánchez"],
+              ["Laura Medina"],
+              ["Tomás Herrera"]
+            ]
+          },
+          "hints": [
+            "La condición dentro de NOT EXISTS es: p.cliente_id = c.id",
+            "SELECT 1 es convencional en EXISTS/NOT EXISTS: solo importa si existe la fila, no su valor"
+          ],
+          "successMessage": "¡Correcto! Marketing puede contactar a estos clientes inactivos.",
+          "failMessage": "Revisa que la condición interna sea p.cliente_id = c.id.",
           "xp": 60
         }
       ]
