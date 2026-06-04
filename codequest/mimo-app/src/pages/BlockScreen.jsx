@@ -103,7 +103,7 @@ export default function BlockScreen() {
   function handleCheckSteps() {
     setChecked(true)
     if (selected !== activeStep.correctIndex) {
-      setWrong((prev) => [...prev, queue[qPos]])
+      if (!isReview) setWrong((prev) => [...prev, queue[qPos]])
       setTotalErrors((prev) => prev + 1)
     }
   }
@@ -112,7 +112,7 @@ export default function BlockScreen() {
   function handleCheckMulti() {
     setChecked(true)
     if (selected !== activeQ.correctIndex) {
-      setWrong((prev) => [...prev, queue[qPos]])
+      if (!isReview) setWrong((prev) => [...prev, queue[qPos]])
       setTotalErrors((prev) => prev + 1)
     }
   }

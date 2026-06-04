@@ -6,10 +6,12 @@
 // No hay que tocar ninguna pantalla: todas leen desde este registro.
 
 import sqlBasico from './sql-basico.json'
+import sqlOracle from './sql-oracle.json'
 // import javaBasico from './java-basico.json'  // <-- Fase 2
 
 export const courses = [
   sqlBasico,
+  sqlOracle,
   // javaBasico,
 ]
 

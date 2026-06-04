@@ -1,13 +1,22 @@
 // src/pages/Settings.jsx
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useProgress } from '../context/ProgressContext.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
 import Button from '../components/common/Button.jsx'
 import './Settings.css'
 
 export default function Settings() {
   const { resetProgress, progress } = useProgress()
+  const { user, signOut } = useAuth()
+  const navigate = useNavigate()
   const [confirming, setConfirming] = useState(false)
   const [done, setDone] = useState(false)
+
+  async function handleSignOut() {
+    await signOut()
+    navigate('/')
+  }
 
   function handleReset() {
     resetProgress()
@@ -23,11 +32,28 @@ export default function Settings() {
         <h1 style={{ fontSize: '1.7rem', fontWeight: 800, marginTop: 6 }}>Ajustes</h1>
       </header>
 
-      <section className="settings__card rise">
+      {user ? (
+        <section className="settings__card rise">
+          <h3>Cuenta</h3>
+          <p className="muted" style={{ marginBottom: 14 }}>{user.email}</p>
+          <Button variant="ghost" onClick={handleSignOut}>Cerrar sesión</Button>
+        </section>
+      ) : (
+        <section className="settings__card rise">
+          <h3>Cuenta</h3>
+          <p className="muted" style={{ marginBottom: 14 }}>
+            Inicia sesión para sincronizar tu progreso entre dispositivos.
+          </p>
+          <Button variant="primary" onClick={() => navigate('/login')}>Entrar / Registrarse</Button>
+        </section>
+      )}
+
+      <section className="settings__card rise" style={{ animationDelay: '40ms' }}>
         <h3>Datos locales</h3>
         <p className="muted">
-          Tu progreso se guarda únicamente en este navegador (localStorage). No se envía a ningún
-          servidor.
+          {user
+            ? 'Tu progreso también se guarda localmente en este navegador.'
+            : 'Tu progreso se guarda únicamente en este navegador (localStorage). No se envía a ningún servidor.'}
         </p>
         <div className="settings__metrics">
           <span>⭐ {progress.xp} XP</span>

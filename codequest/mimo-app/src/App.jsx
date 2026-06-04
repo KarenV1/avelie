@@ -8,6 +8,8 @@ import BlockScreen from './pages/BlockScreen.jsx'
 import PracticeScreen from './pages/PracticeScreen.jsx'
 import Profile from './pages/Profile.jsx'
 import Settings from './pages/Settings.jsx'
+import MistakesReview from './pages/MistakesReview.jsx'
+import Login from './pages/Login.jsx'
 
 export default function App() {
   return (
@@ -21,6 +23,8 @@ export default function App() {
         <Route path="/curso/:courseId/unidad/:unitId/practica/:itemId" element={<PracticeScreen />} />
         <Route path="/perfil" element={<Profile />} />
         <Route path="/ajustes" element={<Settings />} />
+        <Route path="/repasar-errores" element={<MistakesReview />} />
+        <Route path="/login" element={<Login />} />
         <Route path="*" element={<Home />} />
       </Routes>
     </div>

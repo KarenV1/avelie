@@ -113,7 +113,8 @@
             },
             {
               "type": "multiple_choice",
-              "prompt": "¿Qué devuelve la sentencia SELECT * FROM clientes;?",
+              "code": "SELECT *\nFROM clientes;",
+              "prompt": "¿Qué devuelve esta sentencia?",
               "options": [
                 "Solo la primera fila de clientes",
                 "Todas las columnas y todas las filas de la tabla clientes",
@@ -128,7 +129,8 @@
             },
             {
               "type": "fill_blank",
-              "prompt": "En SELECT * FROM clientes;, el ___ indica de qué tabla se leen los datos.",
+              "code": "SELECT *\nFROM clientes;",
+              "prompt": "El ___ indica de qué tabla se leen los datos.",
               "options": [
                 "asterisco (*)",
                 "FROM clientes",
@@ -191,122 +193,552 @@
         {
           "type": "block",
           "id": "b2",
-          "title": "Tablas, filas y columnas",
-          "explanation": "Los datos viven en tablas. Cada tabla tiene columnas (los campos, como nombre o edad) y filas (cada registro individual, como un usuario concreto).",
-          "example": {
-            "code": "Tabla: usuarios\n id | nombre | edad\n----+--------+-----\n  1 | Ana    | 25\n  2 | Luis   | 17",
-            "caption": "id, nombre y edad son columnas; cada renglón es una fila."
-          },
-          "question": {
-            "prompt": "En una tabla, ¿qué representa una fila?",
-            "options": [
-              "Un campo o atributo",
-              "Un registro individual",
-              "El nombre de la tabla",
-              "Una base de datos completa"
-            ],
-            "correctIndex": 1,
-            "feedback": {
-              "correct": "¡Correcto! Cada fila es un registro completo.",
-              "incorrect": "Recuerda: una fila es un registro; las columnas son los campos."
+          "title": "SELECT",
+          "steps": [
+            {
+              "type": "info",
+              "title": "¿Para qué sirve SELECT?",
+              "body": "SELECT es la cláusula que indica qué columnas quieres ver en el resultado. No modifica los datos de la tabla — solo los lee. Después de SELECT escribes el nombre de la columna o columnas que necesitas."
+            },
+            {
+              "type": "example",
+              "title": "Seleccionar una columna",
+              "code": "SELECT nombre\nFROM clientes;",
+              "caption": "Lee solo la columna nombre. Los datos de la tabla no cambian."
+            },
+            {
+              "type": "multiple_choice",
+              "code": "SELECT nombre\nFROM clientes;",
+              "prompt": "¿Esta sentencia modifica los datos de la tabla clientes?",
+              "options": [
+                "Sí, borra la columna nombre",
+                "No, SELECT solo lee datos",
+                "Sí, crea una columna nueva",
+                "Solo la modifica la primera vez"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. SELECT nunca modifica datos: es una sentencia de solo lectura.",
+                "incorrect": "SELECT es de lectura: no agrega, no borra, no modifica nada. Solo devuelve datos."
+              }
+            },
+            {
+              "type": "info",
+              "title": "SELECT * — todas las columnas",
+              "body": "El asterisco (*) es un atajo que significa 'todas las columnas'. SELECT * FROM tabla devuelve todas las columnas disponibles en esa tabla."
+            },
+            {
+              "type": "example",
+              "title": "Traer todas las columnas",
+              "code": "SELECT *\nFROM clientes;",
+              "caption": "El * significa todas las columnas. Devuelve id, nombre, ciudad y edad de cada fila."
+            },
+            {
+              "type": "fill_blank",
+              "code": "SELECT ___\nFROM clientes;",
+              "prompt": "Para traer todas las columnas de la tabla, ¿qué va en el espacio en blanco?",
+              "options": ["nombre", "*", "ALL", "columnas"],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. El asterisco (*) es el atajo para seleccionar todas las columnas.",
+                "incorrect": "El símbolo * significa 'todas las columnas' en SQL."
+              }
+            },
+            {
+              "type": "info",
+              "title": "Seleccionar varias columnas",
+              "body": "Para seleccionar más de una columna, escríbelas separadas por coma después de SELECT. El orden en que las listes determina el orden en que aparecen en el resultado."
+            },
+            {
+              "type": "example",
+              "title": "Varias columnas con comas",
+              "code": "SELECT nombre, ciudad\nFROM clientes;",
+              "caption": "Devuelve solo nombre y ciudad — en ese orden. Las demás columnas no aparecen."
+            },
+            {
+              "type": "code_choice",
+              "prompt": "¿Cuál de estas sentencias selecciona únicamente las columnas nombre y ciudad?",
+              "options": [
+                "SELECT * FROM clientes;",
+                "SELECT nombre ciudad FROM clientes;",
+                "SELECT nombre AND ciudad FROM clientes;",
+                "SELECT nombre, ciudad FROM clientes;"
+              ],
+              "correctIndex": 3,
+              "feedback": {
+                "correct": "Correcto. Las columnas se separan con coma: SELECT nombre, ciudad.",
+                "incorrect": "Las columnas van separadas por coma. Sin coma, SQL no sabe dónde termina una y empieza la otra."
+              }
+            },
+            {
+              "type": "summary",
+              "title": "Resumen — SELECT",
+              "points": [
+                "SELECT indica qué columnas quieres ver en el resultado.",
+                "SELECT nunca modifica datos — es solo de lectura.",
+                "SELECT * devuelve todas las columnas de la tabla.",
+                "Para varias columnas, sepáralas con coma: SELECT col1, col2.",
+                "El orden en que listas las columnas determina su orden en el resultado."
+              ]
             }
-          },
-          "xp": 10
+          ],
+          "xp": 20
         },
         {
           "type": "block",
           "id": "b3",
-          "title": "SELECT básico",
-          "explanation": "La instrucción SELECT se usa para leer datos. SELECT * FROM tabla devuelve todas las columnas (*) de todas las filas de esa tabla.",
-          "example": {
-            "code": "SELECT * FROM usuarios;",
-            "caption": "El asterisco (*) significa \"todas las columnas\"."
-          },
-          "question": {
-            "prompt": "¿Qué devuelve SELECT * FROM productos;?",
-            "options": [
-              "Solo la primera fila",
-              "Todas las columnas y filas de productos",
-              "Solo los nombres de las columnas",
-              "Nada, da error"
-            ],
-            "correctIndex": 1,
-            "feedback": {
-              "correct": "¡Eso es! Devuelve todo el contenido de la tabla.",
-              "incorrect": "El * trae todas las columnas, y sin WHERE trae todas las filas."
+          "title": "FROM",
+          "steps": [
+            {
+              "type": "info",
+              "title": "¿Para qué sirve FROM?",
+              "body": "FROM indica de qué tabla vienen los datos. Toda sentencia SELECT necesita un FROM que diga dónde buscar. La estructura básica es: SELECT columnas FROM tabla."
+            },
+            {
+              "type": "example",
+              "title": "La estructura SELECT … FROM",
+              "code": "SELECT nombre, ciudad\nFROM clientes;",
+              "caption": "SELECT dice qué columnas quieres. FROM dice de qué tabla vienen esas columnas."
+            },
+            {
+              "type": "multiple_choice",
+              "code": "SELECT nombre, ciudad\nFROM clientes;",
+              "prompt": "¿Qué indica FROM clientes en esta sentencia?",
+              "options": [
+                "Que solo devuelve la columna clientes",
+                "Que los datos vienen de la tabla llamada clientes",
+                "Que filtra filas donde nombre es cliente",
+                "Que ordena por la columna clientes"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. FROM clientes dice que los datos se leen de la tabla llamada clientes.",
+                "incorrect": "FROM indica la tabla de origen. FROM clientes = los datos vienen de la tabla clientes."
+              }
+            },
+            {
+              "type": "info",
+              "title": "Columna vs tabla",
+              "body": "Una columna es un campo dentro de una tabla (como nombre o ciudad). Una tabla es la estructura completa que contiene filas y columnas (como clientes o productos). SELECT opera sobre columnas; FROM opera sobre tablas."
+            },
+            {
+              "type": "multiple_choice",
+              "prompt": "En SELECT nombre FROM clientes, ¿qué es nombre y qué es clientes?",
+              "options": [
+                "Ambos son tablas",
+                "nombre es una columna; clientes es una tabla",
+                "nombre es una tabla; clientes es una columna",
+                "Ambos son columnas"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. nombre es una columna dentro de la tabla clientes.",
+                "incorrect": "SELECT va seguido de una columna; FROM va seguido del nombre de la tabla."
+              }
+            },
+            {
+              "type": "fill_blank",
+              "code": "SELECT nombre\n___ clientes;",
+              "prompt": "¿Qué cláusula va en el espacio en blanco para indicar la tabla de origen?",
+              "options": ["WHERE", "FROM", "SELECT", "ORDER"],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. FROM indica la tabla de donde se leen los datos.",
+                "incorrect": "La cláusula que indica la tabla de origen es FROM."
+              }
+            },
+            {
+              "type": "debug",
+              "code": "SELECT nombre\nclientes;",
+              "prompt": "Esta sentencia tiene un error. ¿Qué falta?",
+              "options": [
+                "Falta el punto y coma al final",
+                "Falta la cláusula FROM antes de clientes",
+                "Falta el asterisco después de SELECT",
+                "clientes debería escribirse en mayúsculas"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. Sin FROM, SQL no sabe que clientes es una tabla. La sentencia falla.",
+                "incorrect": "Falta la palabra FROM antes del nombre de la tabla."
+              }
+            },
+            {
+              "type": "code_choice",
+              "prompt": "¿Cuál de estas sentencias tiene la estructura SELECT … FROM correcta?",
+              "options": [
+                "FROM clientes SELECT nombre;",
+                "SELECT nombre clientes;",
+                "SELECT nombre FROM clientes;",
+                "SELECT FROM nombre clientes;"
+              ],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. La estructura es: SELECT columnas FROM tabla.",
+                "incorrect": "El orden correcto es SELECT primero, luego FROM. SELECT columnas FROM tabla."
+              }
+            },
+            {
+              "type": "summary",
+              "title": "Resumen — FROM",
+              "points": [
+                "FROM indica de qué tabla vienen los datos.",
+                "La estructura básica es: SELECT columnas FROM tabla.",
+                "SELECT opera sobre columnas; FROM opera sobre tablas.",
+                "Sin FROM, la sentencia es inválida y SQL devuelve un error.",
+                "FROM siempre va después de SELECT y antes de WHERE."
+              ]
             }
-          },
-          "xp": 10
+          ],
+          "xp": 20
         },
         {
           "type": "block",
           "id": "b4",
-          "title": "Seleccionar columnas específicas",
-          "explanation": "En lugar de * puedes nombrar las columnas que quieres, separadas por comas. Así pides solo lo necesario y la consulta es más clara.",
-          "example": {
-            "code": "SELECT nombre, edad FROM usuarios;",
-            "caption": "Devuelve únicamente las columnas nombre y edad."
-          },
-          "question": {
-            "prompt": "¿Cómo pides solo las columnas nombre y email?",
-            "options": [
-              "SELECT * FROM usuarios;",
-              "SELECT nombre email FROM usuarios;",
-              "SELECT nombre, email FROM usuarios;",
-              "GET nombre, email FROM usuarios;"
-            ],
-            "correctIndex": 2,
-            "feedback": {
-              "correct": "¡Bien! Las columnas se separan con comas.",
-              "incorrect": "Las columnas van separadas por coma: SELECT nombre, email."
+          "title": "Columnas",
+          "steps": [
+            {
+              "type": "info",
+              "title": "Las columnas definen qué quieres ver",
+              "body": "En una tabla, cada columna representa una propiedad de la entidad. Cuando escribes SELECT, eliges qué columnas aparecen en el resultado. Puedes traer una, varias o todas con *."
+            },
+            {
+              "type": "table_reading",
+              "table": "Tabla: clientes\n id | nombre | ciudad    | edad\n----+--------+-----------+-----\n  1 | Ana    | CDMX      |  22\n  2 | Luis   | Monterrey |  17\n  3 | Karen  | CDMX      |  25",
+              "prompt": "¿Cuántas columnas tiene esta tabla?",
+              "options": ["2", "3", "4", "5"],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. Las columnas son id, nombre, ciudad y edad — son 4.",
+                "incorrect": "Cuenta los encabezados: id, nombre, ciudad, edad. Son 4 columnas."
+              }
+            },
+            {
+              "type": "example",
+              "title": "Seleccionar una columna",
+              "code": "SELECT nombre\nFROM clientes;",
+              "caption": "Devuelve solo la columna nombre. Las demás columnas (id, ciudad, edad) no aparecen."
+            },
+            {
+              "type": "multiple_choice",
+              "code": "SELECT ciudad\nFROM clientes;",
+              "prompt": "¿Qué columna devuelve esta sentencia?",
+              "options": ["id", "nombre", "ciudad", "Las cuatro columnas"],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. SELECT ciudad devuelve únicamente los valores de la columna ciudad.",
+                "incorrect": "SELECT ciudad devuelve solo esa columna. Para traer todas usarías SELECT *."
+              }
+            },
+            {
+              "type": "info",
+              "title": "Varias columnas: separa con coma",
+              "body": "Para seleccionar más de una columna, escríbelas después de SELECT separadas por una coma. No va coma después de la última columna antes de FROM."
+            },
+            {
+              "type": "example",
+              "title": "Dos columnas con coma",
+              "code": "SELECT nombre, ciudad\nFROM clientes;",
+              "caption": "Devuelve nombre y ciudad. El orden en que las listas determina el orden en el resultado."
+            },
+            {
+              "type": "fill_blank",
+              "code": "SELECT nombre ___ ciudad\nFROM clientes;",
+              "prompt": "¿Qué va entre nombre y ciudad para seleccionar ambas columnas?",
+              "options": ["AND", "+", ",", ";"],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. Las columnas se separan con coma en SQL.",
+                "incorrect": "En SQL, las columnas de un SELECT se separan con coma (,)."
+              }
+            },
+            {
+              "type": "code_choice",
+              "prompt": "¿Cuál de estas sentencias selecciona únicamente nombre y email de la tabla usuarios?",
+              "options": [
+                "SELECT * FROM usuarios;",
+                "SELECT nombre email FROM usuarios;",
+                "SELECT nombre AND email FROM usuarios;",
+                "SELECT nombre, email FROM usuarios;"
+              ],
+              "correctIndex": 3,
+              "feedback": {
+                "correct": "Correcto. Las columnas van separadas por coma: SELECT nombre, email.",
+                "incorrect": "Las columnas múltiples se separan con coma. La respuesta correcta es SELECT nombre, email."
+              }
+            },
+            {
+              "type": "debug",
+              "code": "SELECT nombre ciudad\nFROM clientes;",
+              "prompt": "Esta sentencia tiene un error. ¿Cuál es?",
+              "options": [
+                "Falta el asterisco",
+                "Falta la coma entre nombre y ciudad",
+                "FROM debería ir antes de SELECT",
+                "Falta el punto y coma al final"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. Sin la coma, SQL interpreta ciudad como un alias de nombre, no como columna separada.",
+                "incorrect": "Falta la coma. Sin ella, SQL no sabe que nombre y ciudad son dos columnas distintas."
+              }
+            },
+            {
+              "type": "multiple_choice",
+              "prompt": "¿Qué ocurre si pides una columna que no existe en la tabla?",
+              "options": [
+                "Devuelve solo las columnas que sí existen",
+                "SQL devuelve un error porque la columna no existe",
+                "Devuelve NULL en esa columna",
+                "Funciona igual que SELECT *"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. SQL devuelve error si pides una columna que no existe en la tabla.",
+                "incorrect": "SQL no inventa columnas. Si la columna no existe, la sentencia falla con error."
+              }
+            },
+            {
+              "type": "summary",
+              "title": "Resumen — Columnas",
+              "points": [
+                "Cada columna representa una propiedad de la entidad en la tabla.",
+                "SELECT col devuelve solo esa columna.",
+                "SELECT col1, col2 devuelve ambas columnas separadas por coma.",
+                "SELECT * devuelve todas las columnas.",
+                "Si pides una columna que no existe, SQL devuelve un error."
+              ]
             }
-          },
-          "xp": 10
+          ],
+          "xp": 25
         },
         {
           "type": "block",
           "id": "b5",
-          "title": "La cláusula WHERE",
-          "explanation": "WHERE filtra las filas según una condición. Solo se devuelven las filas que cumplen esa condición.",
-          "example": {
-            "code": "SELECT nombre FROM usuarios\nWHERE edad >= 18;",
-            "caption": "Devuelve los nombres de los usuarios mayores de edad."
-          },
-          "question": {
-            "prompt": "¿Qué hace la cláusula WHERE?",
-            "options": [
-              "Ordena los resultados",
-              "Filtra filas según una condición",
-              "Cuenta filas",
-              "Une dos tablas"
-            ],
-            "correctIndex": 1,
-            "feedback": {
-              "correct": "¡Correcto! WHERE deja pasar solo las filas que cumplen la condición.",
-              "incorrect": "WHERE filtra: solo conserva las filas que cumplen la condición."
+          "title": "WHERE",
+          "steps": [
+            {
+              "type": "info",
+              "title": "¿Para qué sirve WHERE?",
+              "body": "WHERE filtra las filas que devuelve una consulta. Sin WHERE, SELECT devuelve todas las filas de la tabla. Con WHERE, solo aparecen las filas que cumplen la condición (condition) que escribes."
+            },
+            {
+              "type": "example",
+              "title": "Filtrar por ciudad",
+              "code": "SELECT nombre, ciudad\nFROM clientes\nWHERE ciudad = 'CDMX';",
+              "caption": "Solo devuelve las filas donde ciudad es CDMX. Las demás filas no aparecen."
+            },
+            {
+              "type": "table_reading",
+              "table": "Tabla: clientes\n id | nombre | ciudad\n----+--------+-----------\n  1 | Ana    | CDMX\n  2 | Luis   | Monterrey\n  3 | Karen  | CDMX",
+              "prompt": "Si aplicas WHERE ciudad = 'CDMX', ¿cuántas filas devuelve la consulta?",
+              "options": ["1", "2", "3", "0"],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. Ana (fila 1) y Karen (fila 3) tienen ciudad = 'CDMX' — son 2 filas.",
+                "incorrect": "Busca las filas donde ciudad = 'CDMX': Ana y Karen. Son 2."
+              }
+            },
+            {
+              "type": "multiple_choice",
+              "prompt": "¿WHERE filtra filas o columnas?",
+              "options": [
+                "Columnas — quita las que no necesitas",
+                "Filas — devuelve solo las que cumplen la condición",
+                "Ambos: filas y columnas a la vez",
+                "Ninguno: solo ordena el resultado"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. WHERE filtra filas. SELECT filtra columnas. Son dos operaciones distintas.",
+                "incorrect": "WHERE filtra filas. Para elegir columnas usas SELECT. Cada cláusula tiene su rol."
+              }
+            },
+            {
+              "type": "info",
+              "title": "La estructura SELECT → FROM → WHERE",
+              "body": "Las cláusulas siguen este orden: primero SELECT (qué columnas), luego FROM (de qué tabla), luego WHERE (qué condición deben cumplir las filas). El orden importa: si lo cambias, SQL devuelve error."
+            },
+            {
+              "type": "example",
+              "title": "WHERE con número",
+              "code": "SELECT nombre, edad\nFROM clientes\nWHERE edad >= 18;",
+              "caption": "Devuelve solo las filas donde edad es mayor o igual a 18. Los números no llevan comillas."
+            },
+            {
+              "type": "fill_blank",
+              "code": "SELECT nombre\nFROM clientes\n___ ciudad = 'CDMX';",
+              "prompt": "¿Qué cláusula va para filtrar las filas?",
+              "options": ["SELECT", "FROM", "WHERE", "ORDER"],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. WHERE es la cláusula que aplica la condición de filtro.",
+                "incorrect": "La cláusula que filtra filas es WHERE."
+              }
+            },
+            {
+              "type": "code_choice",
+              "prompt": "¿Cuál de estas sentencias devuelve solo los clientes de la ciudad CDMX?",
+              "options": [
+                "SELECT ciudad FROM clientes;",
+                "SELECT * FROM clientes WHERE ciudad = 'CDMX';",
+                "SELECT * FROM clientes ORDER BY ciudad;",
+                "SELECT ciudad = 'CDMX' FROM clientes;"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. WHERE ciudad = 'CDMX' filtra solo las filas con esa ciudad.",
+                "incorrect": "Para filtrar necesitas WHERE. La sentencia correcta es SELECT * FROM clientes WHERE ciudad = 'CDMX'."
+              }
+            },
+            {
+              "type": "debug",
+              "code": "SELECT nombre\nFROM clientes\nciudad = 'CDMX';",
+              "prompt": "Esta sentencia tiene un error. ¿Qué falta?",
+              "options": [
+                "Falta el asterisco en SELECT",
+                "Falta la cláusula WHERE antes de la condición",
+                "La condición debería ir después de FROM",
+                "Falta una coma antes de ciudad"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. SQL necesita la palabra WHERE antes de la condición de filtro.",
+                "incorrect": "Falta la palabra WHERE. Sin ella, SQL no sabe que ciudad = 'CDMX' es una condición."
+              }
+            },
+            {
+              "type": "summary",
+              "title": "Resumen — WHERE",
+              "points": [
+                "WHERE filtra filas: solo aparecen las que cumplen la condición.",
+                "Sin WHERE, la consulta devuelve todas las filas de la tabla.",
+                "SELECT filtra columnas; WHERE filtra filas — son roles distintos.",
+                "La estructura es: SELECT columnas FROM tabla WHERE condición.",
+                "El orden de las cláusulas importa: SELECT → FROM → WHERE."
+              ]
             }
-          },
-          "xp": 10
+          ],
+          "xp": 20
         },
         {
           "type": "block",
           "id": "b6",
           "title": "Operadores de comparación",
-          "explanation": "Dentro de WHERE usas operadores: = (igual), <> o != (distinto), > , < , >= y <=. Sirven para comparar valores.",
-          "example": {
-            "code": "SELECT nombre FROM usuarios\nWHERE edad > 30;",
-            "caption": "Usuarios con más de 30 años."
-          },
-          "question": {
-            "prompt": "¿Qué operador significa \"distinto de\" en SQL?",
-            "options": ["==", "<>", "!==", "><"],
-            "correctIndex": 1,
-            "feedback": {
-              "correct": "¡Sí! <> (o !=) significa distinto.",
-              "incorrect": "En SQL \"distinto de\" se escribe <> (también se acepta !=)."
+          "steps": [
+            {
+              "type": "info",
+              "title": "Los operadores de comparación",
+              "body": "Dentro de WHERE usas operadores (operators) para comparar valores. Los básicos son: = (igual), <> (distinto de), > (mayor que), < (menor que), >= (mayor o igual) y <= (menor o igual)."
+            },
+            {
+              "type": "example",
+              "title": "Usar el operador >",
+              "code": "SELECT nombre, edad\nFROM clientes\nWHERE edad > 18;",
+              "caption": "Devuelve solo las filas donde edad es mayor que 18. Las filas con edad = 18 no aparecen."
+            },
+            {
+              "type": "multiple_choice",
+              "prompt": "¿Qué significa el operador <> en SQL?",
+              "options": [
+                "Menor o igual que",
+                "Distinto de",
+                "Mayor o igual que",
+                "Menor que"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. <> significa 'distinto de'. También se puede escribir como !=.",
+                "incorrect": "El operador <> significa 'distinto de'. Por ejemplo, WHERE ciudad <> 'CDMX' excluye esa ciudad."
+              }
+            },
+            {
+              "type": "example",
+              "title": "Usar el operador <=",
+              "code": "SELECT nombre, edad\nFROM clientes\nWHERE edad <= 17;",
+              "caption": "Devuelve las filas donde edad es menor o igual a 17. Incluye a los de exactamente 17 años."
+            },
+            {
+              "type": "fill_blank",
+              "prompt": "Para filtrar filas donde edad es mayor o igual a 18, el operador correcto es WHERE edad ___ 18.",
+              "options": [">", ">=", "=>", ">>"],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. >= es el operador 'mayor o igual que'.",
+                "incorrect": "El operador 'mayor o igual que' se escribe >= (primero el signo mayor, luego el igual)."
+              }
+            },
+            {
+              "type": "table_reading",
+              "table": "Tabla: clientes\n id | nombre | edad\n----+--------+-----\n  1 | Ana    |  22\n  2 | Luis   |  17\n  3 | Karen  |  25\n  4 | Marta  |  15",
+              "prompt": "¿Cuántas filas devuelve WHERE edad >= 18?",
+              "options": ["1", "2", "3", "4"],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. Ana (22) y Karen (25) cumplen edad >= 18. Luis (17) y Marta (15) no.",
+                "incorrect": "Busca filas con edad 18 o más: Ana (22) y Karen (25). Son 2 filas."
+              }
+            },
+            {
+              "type": "multiple_choice",
+              "code": "SELECT nombre\nFROM clientes\nWHERE ciudad <> 'CDMX';",
+              "prompt": "¿Qué filas devuelve esta sentencia?",
+              "options": [
+                "Solo las filas donde ciudad es CDMX",
+                "Las filas donde ciudad NO es CDMX",
+                "Todas las filas",
+                "Ninguna fila"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. <> excluye las filas que coincidan con 'CDMX' y devuelve el resto.",
+                "incorrect": "<> es 'distinto de'. WHERE ciudad <> 'CDMX' devuelve las filas que NO son CDMX."
+              }
+            },
+            {
+              "type": "code_choice",
+              "prompt": "¿Cuál de estas sentencias devuelve los productos con precio menor a 50?",
+              "options": [
+                "SELECT * FROM productos WHERE precio > 50;",
+                "SELECT * FROM productos WHERE precio = 50;",
+                "SELECT * FROM productos WHERE precio < 50;",
+                "SELECT * FROM productos WHERE precio <> 50;"
+              ],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. El operador < significa 'menor que'.",
+                "incorrect": "Para 'menor que' se usa <. La sentencia correcta es WHERE precio < 50."
+              }
+            },
+            {
+              "type": "debug",
+              "code": "SELECT nombre\nFROM clientes\nWHERE edad => 18;",
+              "prompt": "Esta sentencia tiene un error en el operador. ¿Cuál es?",
+              "options": [
+                "Debería ser edad >= 18, no edad => 18",
+                "Debería ser edad >> 18",
+                "Falta una coma antes de edad",
+                "18 debería llevar comillas"
+              ],
+              "correctIndex": 0,
+              "feedback": {
+                "correct": "Correcto. El operador 'mayor o igual' es >= (primero mayor, luego igual). => no existe en SQL.",
+                "incorrect": "El orden importa: >= es válido, => no es un operador SQL — da error."
+              }
+            },
+            {
+              "type": "summary",
+              "title": "Resumen — Operadores de comparación",
+              "points": [
+                "= compara igualdad; <> compara desigualdad (distinto de).",
+                "> mayor que; < menor que; >= mayor o igual; <= menor o igual.",
+                "Los operadores van entre la columna y el valor en WHERE.",
+                "El operador >= se escribe primero el mayor, luego el igual.",
+                "Los números no llevan comillas; los textos sí (comillas simples)."
+              ]
             }
-          },
-          "xp": 10
+          ],
+          "xp": 20
         },
         {
           "type": "practice",
@@ -348,152 +780,664 @@
         {
           "type": "block",
           "id": "b7",
-          "title": "Ordenar con ORDER BY",
-          "explanation": "ORDER BY ordena el resultado por una o varias columnas. ASC es ascendente (por defecto) y DESC descendente.",
-          "example": {
-            "code": "SELECT nombre, edad FROM usuarios\nORDER BY edad DESC;",
-            "caption": "Del más viejo al más joven."
-          },
-          "question": {
-            "prompt": "¿Qué hace ORDER BY edad DESC?",
-            "options": [
-              "Filtra por edad",
-              "Ordena de mayor a menor edad",
-              "Ordena de menor a mayor edad",
-              "Elimina la columna edad"
-            ],
-            "correctIndex": 1,
-            "feedback": {
-              "correct": "¡Exacto! DESC ordena de mayor a menor.",
-              "incorrect": "DESC = descendente, es decir, de mayor a menor."
+          "title": "Texto y comillas",
+          "steps": [
+            {
+              "type": "info",
+              "title": "Los textos van entre comillas simples",
+              "body": "En SQL, cuando comparas un valor de texto (cadena de caracteres), debes escribirlo entre comillas simples. Por ejemplo: WHERE ciudad = 'CDMX'. Las comillas dobles no se usan para valores de texto en SQL estándar."
+            },
+            {
+              "type": "example",
+              "title": "Filtrar por texto",
+              "code": "SELECT nombre, ciudad\nFROM clientes\nWHERE ciudad = 'CDMX';",
+              "caption": "'CDMX' lleva comillas simples porque es un valor de texto (string). Sin comillas, SQL da error."
+            },
+            {
+              "type": "multiple_choice",
+              "prompt": "¿Cómo se escribe correctamente un valor de texto en una condición SQL?",
+              "options": [
+                "WHERE ciudad = CDMX",
+                "WHERE ciudad = \"CDMX\"",
+                "WHERE ciudad = 'CDMX'",
+                "WHERE ciudad = (CDMX)"
+              ],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. Los valores de texto van entre comillas simples en SQL estándar.",
+                "incorrect": "Los textos van entre comillas simples: WHERE ciudad = 'CDMX'. Las dobles no son válidas para valores en SQL estándar."
+              }
+            },
+            {
+              "type": "info",
+              "title": "Los números NO llevan comillas",
+              "body": "Los valores numéricos se escriben directamente, sin comillas. Escribir un número entre comillas lo convierte en texto y puede causar errores de comparación. Solo los textos (strings) llevan comillas simples."
+            },
+            {
+              "type": "example",
+              "title": "Texto vs número",
+              "code": "-- Texto: lleva comillas simples\nSELECT nombre FROM clientes\nWHERE ciudad = 'Monterrey';\n\n-- Número: sin comillas\nSELECT nombre FROM clientes\nWHERE edad = 25;",
+              "caption": "'Monterrey' es texto — lleva comillas. 25 es número — no lleva comillas."
+            },
+            {
+              "type": "multiple_choice",
+              "prompt": "¿Cuál de estas condiciones está correctamente escrita?",
+              "options": [
+                "WHERE edad = '25'",
+                "WHERE nombre = Ana",
+                "WHERE ciudad = 'CDMX'",
+                "WHERE precio = 'cien'"
+              ],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. 'CDMX' es un texto entre comillas simples — es la forma correcta.",
+                "incorrect": "CDMX es un texto, así que necesita comillas simples: WHERE ciudad = 'CDMX'."
+              }
+            },
+            {
+              "type": "fill_blank",
+              "prompt": "En SQL, para filtrar por texto el valor va entre comillas ___.",
+              "options": ["dobles (\"..\")", "simples ('..')", "sin comillas", "cuadradas ([..])"],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. Los textos van entre comillas simples en SQL estándar.",
+                "incorrect": "Los valores de texto usan comillas simples, no dobles ni ningún otro carácter."
+              }
+            },
+            {
+              "type": "debug",
+              "code": "SELECT nombre\nFROM clientes\nWHERE ciudad = \"CDMX\";",
+              "prompt": "Esta sentencia tiene un error. ¿Cuál es?",
+              "options": [
+                "Falta el asterisco en SELECT",
+                "CDMX debería escribirse en minúsculas",
+                "Los valores de texto usan comillas simples, no dobles",
+                "Falta un punto y coma al final"
+              ],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. SQL estándar y Oracle usan comillas simples para textos. \"CDMX\" debería ser 'CDMX'.",
+                "incorrect": "El problema son las comillas dobles. SQL estándar requiere comillas simples para valores de texto."
+              }
+            },
+            {
+              "type": "code_choice",
+              "prompt": "¿Cuál de estas sentencias tiene la sintaxis correcta para filtrar por texto?",
+              "options": [
+                "SELECT * FROM clientes WHERE ciudad = CDMX;",
+                "SELECT * FROM clientes WHERE ciudad = \"CDMX\";",
+                "SELECT * FROM clientes WHERE ciudad = 'CDMX';",
+                "SELECT * FROM clientes WHERE ciudad == 'CDMX';"
+              ],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. 'CDMX' entre comillas simples y = (no ==). Es la sintaxis estándar de SQL.",
+                "incorrect": "La sintaxis correcta usa comillas simples y un solo signo igual: WHERE ciudad = 'CDMX'."
+              }
+            },
+            {
+              "type": "summary",
+              "title": "Resumen — Texto y comillas",
+              "points": [
+                "Los valores de texto (strings) van entre comillas simples: 'CDMX'.",
+                "Los números no llevan comillas: WHERE edad = 25.",
+                "Las comillas dobles no son para valores de texto en SQL estándar.",
+                "Sin comillas en un texto, SQL da error porque no reconoce el valor.",
+                "En SQL, el operador de igualdad es = (no ==)."
+              ]
             }
-          },
-          "xp": 10
+          ],
+          "xp": 20
         },
         {
           "type": "block",
           "id": "b8",
-          "title": "Limitar resultados con LIMIT",
-          "explanation": "LIMIT restringe cuántas filas devuelve la consulta. Es útil para ver una muestra o el \"top N\".",
-          "example": {
-            "code": "SELECT nombre FROM usuarios\nORDER BY edad DESC\nLIMIT 3;",
-            "caption": "Los 3 usuarios de mayor edad."
-          },
-          "question": {
-            "prompt": "¿Para qué sirve LIMIT 5?",
-            "options": [
-              "Devuelve como máximo 5 filas",
-              "Filtra edades menores a 5",
-              "Ordena 5 columnas",
-              "Borra 5 filas"
-            ],
-            "correctIndex": 0,
-            "feedback": {
-              "correct": "¡Bien! LIMIT acota el número de filas devueltas.",
-              "incorrect": "LIMIT N devuelve como máximo N filas."
+          "title": "AND",
+          "steps": [
+            {
+              "type": "info",
+              "title": "AND — ambas condiciones deben ser verdaderas",
+              "body": "AND combina dos condiciones en WHERE. Una fila aparece en el resultado solo si AMBAS condiciones se cumplen al mismo tiempo. Si una sola falla, la fila queda fuera."
+            },
+            {
+              "type": "example",
+              "title": "Filtrar con AND",
+              "code": "SELECT nombre, ciudad, edad\nFROM clientes\nWHERE ciudad = 'CDMX'\n  AND edad >= 18;",
+              "caption": "Solo aparecen los clientes que son de CDMX Y tienen 18 años o más. Las dos condiciones deben cumplirse."
+            },
+            {
+              "type": "table_reading",
+              "table": "Tabla: clientes\n id | nombre | ciudad    | edad\n----+--------+-----------+-----\n  1 | Ana    | CDMX      |  22\n  2 | Luis   | Monterrey |  17\n  3 | Karen  | CDMX      |  25\n  4 | Marta  | CDMX      |  15",
+              "prompt": "¿Cuántas filas devuelve WHERE ciudad = 'CDMX' AND edad >= 18?",
+              "options": ["1", "2", "3", "4"],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. Ana (CDMX, 22) y Karen (CDMX, 25) cumplen ambas condiciones. Marta tiene 15 años y Luis no es de CDMX.",
+                "incorrect": "Necesitas ciudad = 'CDMX' Y edad >= 18 al mismo tiempo. Solo Ana y Karen cumplen las dos."
+              }
+            },
+            {
+              "type": "multiple_choice",
+              "prompt": "Con WHERE condición_A AND condición_B, ¿cuándo aparece una fila?",
+              "options": [
+                "Cuando se cumple A o B (cualquiera de las dos)",
+                "Cuando se cumplen A y B al mismo tiempo",
+                "Cuando no se cumple ninguna",
+                "Siempre, sin importar las condiciones"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. AND es estricto: exige que AMBAS condiciones sean verdaderas.",
+                "incorrect": "AND requiere que las dos condiciones se cumplan a la vez. Si una falla, la fila no aparece."
+              }
+            },
+            {
+              "type": "info",
+              "title": "AND reduce el número de resultados",
+              "body": "Agregar AND siempre produce igual o menos resultados que una sola condición. Cuantas más condiciones combines con AND, más restrictivo es el filtro."
+            },
+            {
+              "type": "fill_blank",
+              "code": "SELECT nombre\nFROM clientes\nWHERE ciudad = 'CDMX' ___ edad >= 18;",
+              "prompt": "¿Qué operador lógico combina las dos condiciones para que ambas deban cumplirse?",
+              "options": ["OR", "AND", "+", "WHERE"],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. AND exige que ciudad = 'CDMX' y edad >= 18 sean verdaderas al mismo tiempo.",
+                "incorrect": "Para exigir que dos condiciones se cumplan a la vez, usa AND."
+              }
+            },
+            {
+              "type": "code_choice",
+              "prompt": "¿Cuál devuelve los productos con precio menor a 100 Y de la categoría 'Electrónica'?",
+              "options": [
+                "SELECT * FROM productos WHERE precio < 100;",
+                "SELECT * FROM productos WHERE categoria = 'Electrónica';",
+                "SELECT * FROM productos WHERE precio < 100 AND categoria = 'Electrónica';",
+                "SELECT * FROM productos WHERE precio < 100 OR categoria = 'Electrónica';"
+              ],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. AND combina las dos condiciones: precio < 100 y categoría = Electrónica deben cumplirse juntas.",
+                "incorrect": "Para que se cumplan las dos condiciones a la vez necesitas AND, no OR."
+              }
+            },
+            {
+              "type": "debug",
+              "code": "SELECT nombre\nFROM clientes\nWHERE ciudad = 'CDMX'\n  AND AND edad >= 18;",
+              "prompt": "Esta sentencia tiene un error. ¿Cuál es?",
+              "options": [
+                "Falta una coma entre las condiciones",
+                "AND está escrito dos veces seguidos",
+                "ciudad debería ir sin comillas",
+                "Falta ORDER BY al final"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. AND aparece dos veces seguidos, lo cual es un error de sintaxis.",
+                "incorrect": "El problema es el AND duplicado. Solo se escribe una vez entre las dos condiciones."
+              }
+            },
+            {
+              "type": "summary",
+              "title": "Resumen — AND",
+              "points": [
+                "AND combina dos condiciones: ambas deben ser verdaderas para que la fila aparezca.",
+                "Si una de las condiciones falla, la fila queda fuera del resultado.",
+                "Más condiciones con AND = resultado más restrictivo (menos filas).",
+                "Estructura: WHERE condición_A AND condición_B.",
+                "AND se escribe una sola vez entre cada par de condiciones."
+              ]
             }
-          },
-          "xp": 10
+          ],
+          "xp": 20
         },
         {
           "type": "block",
           "id": "b9",
-          "title": "Combinar condiciones: AND y OR",
-          "explanation": "Puedes combinar varias condiciones en WHERE. AND exige que se cumplan todas; OR exige que se cumpla al menos una.",
-          "example": {
-            "code": "SELECT nombre FROM usuarios\nWHERE edad > 18 AND pais = 'MX';",
-            "caption": "Mayores de 18 Y de México."
-          },
-          "question": {
-            "prompt": "Con WHERE a AND b, una fila aparece cuando…",
-            "options": [
-              "Se cumple a o b",
-              "Se cumplen a y b a la vez",
-              "No se cumple ninguna",
-              "Siempre aparece"
-            ],
-            "correctIndex": 1,
-            "feedback": {
-              "correct": "¡Correcto! AND exige que ambas condiciones sean verdaderas.",
-              "incorrect": "AND requiere que TODAS las condiciones se cumplan a la vez."
+          "title": "OR",
+          "steps": [
+            {
+              "type": "info",
+              "title": "OR — basta con que una condición sea verdadera",
+              "body": "OR combina dos condiciones en WHERE. Una fila aparece en el resultado si se cumple AL MENOS UNA de las condiciones. No es necesario que se cumplan las dos."
+            },
+            {
+              "type": "example",
+              "title": "Filtrar con OR",
+              "code": "SELECT nombre, ciudad\nFROM clientes\nWHERE ciudad = 'CDMX'\n   OR ciudad = 'Monterrey';",
+              "caption": "Devuelve las filas donde ciudad es CDMX o Monterrey. Basta que una condición sea verdadera."
+            },
+            {
+              "type": "table_reading",
+              "table": "Tabla: clientes\n id | nombre | ciudad\n----+--------+-------------\n  1 | Ana    | CDMX\n  2 | Luis   | Monterrey\n  3 | Karen  | CDMX\n  4 | Marta  | Guadalajara",
+              "prompt": "¿Cuántas filas devuelve WHERE ciudad = 'CDMX' OR ciudad = 'Monterrey'?",
+              "options": ["1", "2", "3", "4"],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. Ana (CDMX), Luis (Monterrey) y Karen (CDMX) cumplen al menos una condición. Son 3 filas.",
+                "incorrect": "Cuenta las filas donde ciudad es CDMX o Monterrey: Ana, Luis y Karen. Son 3."
+              }
+            },
+            {
+              "type": "multiple_choice",
+              "prompt": "Con WHERE condición_A OR condición_B, ¿cuándo aparece una fila?",
+              "options": [
+                "Solo cuando se cumplen A y B al mismo tiempo",
+                "Cuando se cumple A, B, o ambas",
+                "Cuando no se cumple ninguna",
+                "Solo cuando se cumple exactamente una, no las dos"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. OR incluye las filas donde se cumple A, o B, o las dos a la vez.",
+                "incorrect": "OR acepta que se cumpla A, o B, o ambas. Es suficiente con una."
+              }
+            },
+            {
+              "type": "info",
+              "title": "Diferencia clave: AND vs OR",
+              "body": "AND es más restrictivo: exige que TODAS las condiciones se cumplan. OR es más permisivo: basta con que se cumpla UNA. Por eso, OR generalmente devuelve más filas que AND con las mismas condiciones."
+            },
+            {
+              "type": "multiple_choice",
+              "table": "Tabla: clientes\n id | nombre | ciudad    | edad\n----+--------+-----------+-----\n  1 | Ana    | CDMX      |  22\n  2 | Luis   | Monterrey |  17\n  3 | Karen  | CDMX      |  25",
+              "prompt": "¿Cuál devuelve MÁS filas sobre esta tabla?",
+              "options": [
+                "WHERE ciudad = 'CDMX' AND edad >= 18",
+                "WHERE ciudad = 'CDMX' OR edad >= 18",
+                "Ambas devuelven el mismo número",
+                "Depende del tipo de dato"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. OR devuelve más filas porque basta con que se cumpla una condición.",
+                "incorrect": "OR es más permisivo: devuelve todos los que cumplan ciudad='CDMX' o edad>=18 (o ambos). AND sería solo Ana y Karen."
+              }
+            },
+            {
+              "type": "fill_blank",
+              "code": "SELECT nombre\nFROM clientes\nWHERE pais = 'MX' ___ pais = 'AR';",
+              "prompt": "¿Qué operador lógico va para devolver clientes de México o de Argentina?",
+              "options": ["AND", "OR", "NOT", "FROM"],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. OR devuelve las filas donde se cumple una condición u otra.",
+                "incorrect": "Para 'uno u otro', usas OR. AND exigiría que pais sea MX y AR al mismo tiempo, lo cual es imposible."
+              }
+            },
+            {
+              "type": "debug",
+              "code": "SELECT nombre\nFROM clientes\nWHERE ciudad = 'CDMX'\n  OR OR ciudad = 'Monterrey';",
+              "prompt": "Esta sentencia tiene un error. ¿Cuál es?",
+              "options": [
+                "Falta una coma entre las condiciones",
+                "OR está escrito dos veces seguidos",
+                "ciudad debería ir sin comillas",
+                "Falta AND antes del segundo OR"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. OR aparece duplicado, lo cual es un error de sintaxis.",
+                "incorrect": "El problema es el OR doble. Solo se escribe una vez entre cada par de condiciones."
+              }
+            },
+            {
+              "type": "summary",
+              "title": "Resumen — OR",
+              "points": [
+                "OR incluye una fila si se cumple al menos una de las condiciones.",
+                "OR es más permisivo que AND: generalmente devuelve más filas.",
+                "AND exige que todas las condiciones se cumplan; OR con que baste una.",
+                "Estructura: WHERE condición_A OR condición_B.",
+                "OR se escribe una sola vez entre cada par de condiciones."
+              ]
             }
-          },
-          "xp": 10
+          ],
+          "xp": 20
         },
         {
           "type": "block",
           "id": "b10",
-          "title": "Buscar texto con LIKE",
-          "explanation": "LIKE busca texto por patrón. El comodín % representa cualquier secuencia de caracteres y _ representa un solo carácter.",
-          "example": {
-            "code": "SELECT nombre FROM usuarios\nWHERE nombre LIKE 'A%';",
-            "caption": "Nombres que empiezan con A."
-          },
-          "question": {
-            "prompt": "¿Qué selecciona LIKE 'A%'?",
-            "options": [
-              "Nombres exactamente iguales a A",
-              "Nombres que terminan en A",
-              "Nombres que empiezan con A",
-              "Nombres de un solo carácter"
-            ],
-            "correctIndex": 2,
-            "feedback": {
-              "correct": "¡Sí! % al final captura cualquier cosa después de la A.",
-              "incorrect": "'A%' = empieza con A, seguido de cualquier texto (%)."
+          "title": "ORDER BY",
+          "steps": [
+            {
+              "type": "info",
+              "title": "ORDER BY ordena el resultado",
+              "body": "ORDER BY ordena las filas del resultado según una columna. Sin ORDER BY, el orden de las filas no está garantizado — puede cambiar entre ejecuciones. ORDER BY no filtra ni elimina filas: solo cambia su orden."
+            },
+            {
+              "type": "example",
+              "title": "Ordenar por nombre",
+              "code": "SELECT nombre, ciudad\nFROM clientes\nORDER BY nombre;",
+              "caption": "Devuelve las mismas filas que sin ORDER BY, pero ahora ordenadas alfabéticamente por nombre."
+            },
+            {
+              "type": "multiple_choice",
+              "code": "SELECT nombre, ciudad\nFROM clientes\nORDER BY nombre;",
+              "prompt": "¿Qué hace ORDER BY nombre en esta consulta?",
+              "options": [
+                "Filtra solo las filas donde nombre tiene valor",
+                "Elimina filas duplicadas por nombre",
+                "Ordena el resultado alfabéticamente por nombre",
+                "Crea una columna nueva llamada nombre"
+              ],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. ORDER BY nombre ordena las filas de A a Z por la columna nombre.",
+                "incorrect": "ORDER BY solo ordena. No filtra ni elimina filas."
+              }
+            },
+            {
+              "type": "info",
+              "title": "ORDER BY va al final de la consulta",
+              "body": "Si tienes WHERE, ORDER BY siempre va después. La secuencia es: SELECT → FROM → WHERE → ORDER BY. Cambiar el orden de las cláusulas provoca un error de sintaxis."
+            },
+            {
+              "type": "example",
+              "title": "ORDER BY después de WHERE",
+              "code": "SELECT nombre, ciudad\nFROM clientes\nWHERE ciudad = 'CDMX'\nORDER BY nombre;",
+              "caption": "WHERE filtra primero. ORDER BY ordena el resultado filtrado. El orden de las cláusulas importa."
+            },
+            {
+              "type": "fill_blank",
+              "code": "SELECT nombre\nFROM clientes\nWHERE ciudad = 'CDMX'\n___ BY nombre;",
+              "prompt": "¿Qué cláusula va para ordenar el resultado?",
+              "options": ["SELECT", "SORT", "ORDER", "GROUP"],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. La cláusula de ordenamiento es ORDER BY.",
+                "incorrect": "En SQL, para ordenar resultados se usa ORDER BY (no SORT BY ni ninguna otra variación)."
+              }
+            },
+            {
+              "type": "code_choice",
+              "prompt": "¿Cuál de estas sentencias ordena correctamente por la columna edad?",
+              "options": [
+                "SELECT nombre FROM clientes SORT BY edad;",
+                "SELECT nombre FROM clientes WHERE edad ORDER BY;",
+                "SELECT nombre FROM clientes ORDER edad;",
+                "SELECT nombre FROM clientes ORDER BY edad;"
+              ],
+              "correctIndex": 3,
+              "feedback": {
+                "correct": "Correcto. La sintaxis es ORDER BY columna al final de la consulta.",
+                "incorrect": "La sintaxis correcta es ORDER BY seguido del nombre de la columna."
+              }
+            },
+            {
+              "type": "debug",
+              "code": "SELECT nombre\nFROM clientes\nORDER BY nombre\nWHERE ciudad = 'CDMX';",
+              "prompt": "Las cláusulas están en orden incorrecto. ¿Cuál es el error?",
+              "options": [
+                "ORDER BY debería ir antes de FROM",
+                "WHERE debería ir antes de ORDER BY",
+                "Falta SELECT * en lugar de SELECT nombre",
+                "La tabla clientes no puede usarse con ORDER BY"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. WHERE siempre va antes de ORDER BY. El orden correcto es: FROM → WHERE → ORDER BY.",
+                "incorrect": "Las cláusulas tienen un orden fijo: SELECT → FROM → WHERE → ORDER BY. WHERE debe ir antes de ORDER BY."
+              }
+            },
+            {
+              "type": "summary",
+              "title": "Resumen — ORDER BY",
+              "points": [
+                "ORDER BY ordena las filas del resultado según una columna.",
+                "No filtra ni elimina filas — solo cambia su posición.",
+                "Sin ORDER BY, el orden de las filas no está garantizado.",
+                "ORDER BY va al final: después de WHERE si lo hay.",
+                "El orden de cláusulas: SELECT → FROM → WHERE → ORDER BY."
+              ]
             }
-          },
-          "xp": 10
+          ],
+          "xp": 20
         },
         {
           "type": "block",
           "id": "b11",
-          "title": "Contar con COUNT",
-          "explanation": "Las funciones de agregación resumen datos. COUNT(*) cuenta filas; también existen SUM, AVG, MIN y MAX para sumar, promediar o hallar extremos.",
-          "example": {
-            "code": "SELECT COUNT(*) FROM usuarios;",
-            "caption": "Cuántos usuarios hay en total."
-          },
-          "question": {
-            "prompt": "¿Qué devuelve COUNT(*)?",
-            "options": [
-              "La suma de una columna",
-              "El número de filas",
-              "El promedio de edad",
-              "El primer nombre"
-            ],
-            "correctIndex": 1,
-            "feedback": {
-              "correct": "¡Correcto! COUNT(*) cuenta filas.",
-              "incorrect": "COUNT(*) devuelve cuántas filas hay."
+          "title": "ASC y DESC",
+          "steps": [
+            {
+              "type": "info",
+              "title": "ASC y DESC controlan la dirección del orden",
+              "body": "Después de ORDER BY puedes indicar la dirección: ASC (ascendente) ordena de menor a mayor o de A a Z. DESC (descendente) ordena de mayor a menor o de Z a A. Si no especificas ninguno, SQL usa ASC por defecto."
+            },
+            {
+              "type": "example",
+              "title": "Orden ascendente",
+              "code": "SELECT nombre, precio\nFROM productos\nORDER BY precio ASC;",
+              "caption": "Muestra los productos del más barato al más caro. ASC es el comportamiento por defecto."
+            },
+            {
+              "type": "example",
+              "title": "Orden descendente",
+              "code": "SELECT nombre, precio\nFROM productos\nORDER BY precio DESC;",
+              "caption": "Muestra los productos del más caro al más barato. DESC invierte el orden."
+            },
+            {
+              "type": "multiple_choice",
+              "prompt": "¿Qué hace ORDER BY edad ASC?",
+              "options": [
+                "Ordena de mayor a menor edad (el más viejo primero)",
+                "Ordena de menor a mayor edad (el más joven primero)",
+                "Filtra solo los menores de edad",
+                "Elimina filas con edad duplicada"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. ASC = ascendente, de menor a mayor. El más joven aparece primero.",
+                "incorrect": "ASC = ascendente = de menor a mayor. El más joven primero; el más viejo al final."
+              }
+            },
+            {
+              "type": "info",
+              "title": "ASC es el orden por defecto",
+              "body": "Si escribes ORDER BY columna sin ASC ni DESC, SQL aplica ASC automáticamente. Puedes ser explícito con ASC para que el código quede más claro, pero no es obligatorio."
+            },
+            {
+              "type": "fill_blank",
+              "prompt": "Para ordenar precios del más caro al más barato, la dirección es ORDER BY precio ___.",
+              "options": ["ASC", "DESC", "MAX", "DOWN"],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. DESC ordena de mayor a menor, es decir, del más caro al más barato.",
+                "incorrect": "Del más caro al más barato es orden descendente: ORDER BY precio DESC."
+              }
+            },
+            {
+              "type": "table_reading",
+              "table": "Tabla: productos\n id | nombre   | precio\n----+----------+--------\n  1 | Monitor  |    350\n  2 | Teclado  |     80\n  3 | Mouse    |     45",
+              "prompt": "Con ORDER BY precio ASC, ¿qué producto aparece primero?",
+              "options": ["Monitor (350)", "Teclado (80)", "Mouse (45)", "El orden no cambia"],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. ASC ordena de menor a mayor precio: Mouse (45) → Teclado (80) → Monitor (350).",
+                "incorrect": "ASC = de menor a mayor. El precio más bajo (45, Mouse) queda primero."
+              }
+            },
+            {
+              "type": "code_choice",
+              "prompt": "¿Cuál ordena los clientes de Z a A por nombre?",
+              "options": [
+                "SELECT nombre FROM clientes ORDER BY nombre;",
+                "SELECT nombre FROM clientes ORDER BY nombre ASC;",
+                "SELECT nombre FROM clientes ORDER BY nombre DESC;",
+                "SELECT nombre FROM clientes ORDER BY nombre REVERSE;"
+              ],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. DESC ordena de Z a A (descendente alfabético).",
+                "incorrect": "Para Z a A necesitas orden descendente: ORDER BY nombre DESC."
+              }
+            },
+            {
+              "type": "debug",
+              "code": "SELECT nombre, edad\nFROM clientes\nORDER BY edad ASCC;",
+              "prompt": "Esta sentencia tiene un error tipográfico. ¿Cuál es?",
+              "options": [
+                "edad debería ir entre paréntesis",
+                "ASC está mal escrito — tiene una C extra: ASCC",
+                "Falta FROM antes de clientes",
+                "ORDER debería escribirse ORDERBY sin espacio"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. La palabra clave es ASC, no ASCC. La C extra provoca error de sintaxis.",
+                "incorrect": "El error está en ASCC. La palabra clave correcta es ASC (tres letras)."
+              }
+            },
+            {
+              "type": "summary",
+              "title": "Resumen — ASC y DESC",
+              "points": [
+                "ASC (ascendente): de menor a mayor, de A a Z. Es el orden por defecto.",
+                "DESC (descendente): de mayor a menor, de Z a A.",
+                "Se escriben después del nombre de columna en ORDER BY.",
+                "Sin especificar, SQL aplica ASC automáticamente.",
+                "ASC y DESC solo controlan la dirección — no filtran ni eliminan filas."
+              ]
             }
-          },
-          "xp": 10
+          ],
+          "xp": 20
         },
         {
           "type": "block",
           "id": "b12",
-          "title": "Agrupar con GROUP BY",
-          "explanation": "GROUP BY agrupa filas que comparten un valor y permite aplicar una agregación a cada grupo, por ejemplo contar usuarios por país.",
-          "example": {
-            "code": "SELECT pais, COUNT(*)\nFROM usuarios\nGROUP BY pais;",
-            "caption": "Cuántos usuarios hay en cada país."
-          },
-          "question": {
-            "prompt": "¿Qué hace GROUP BY pais junto con COUNT(*)?",
-            "options": [
-              "Cuenta el total ignorando el país",
-              "Cuenta usuarios dentro de cada país",
-              "Ordena por país",
-              "Borra duplicados de país"
-            ],
-            "correctIndex": 1,
-            "feedback": {
-              "correct": "¡Exacto! Cuenta filas por cada grupo de país.",
-              "incorrect": "GROUP BY crea grupos; COUNT(*) cuenta dentro de cada grupo."
+          "title": "Consulta completa",
+          "steps": [
+            {
+              "type": "info",
+              "title": "La estructura completa de una consulta SELECT",
+              "body": "Una consulta SQL puede combinar todas las cláusulas que aprendiste. El orden obligatorio es: SELECT → FROM → WHERE → ORDER BY. Si cambias ese orden, SQL devuelve error de sintaxis."
+            },
+            {
+              "type": "example",
+              "title": "Consulta con todas las cláusulas",
+              "code": "SELECT nombre, ciudad, edad\nFROM clientes\nWHERE ciudad = 'CDMX'\n  AND edad >= 18\nORDER BY edad DESC;",
+              "caption": "Clientes de CDMX mayores de edad, ordenados del más viejo al más joven."
+            },
+            {
+              "type": "multiple_choice",
+              "code": "SELECT nombre, ciudad, edad\nFROM clientes\nWHERE ciudad = 'CDMX'\n  AND edad >= 18\nORDER BY edad DESC;",
+              "prompt": "¿En qué orden aparece la lista de clientes de esta consulta?",
+              "options": [
+                "Del más joven al más viejo",
+                "Del más viejo al más joven",
+                "Alfabéticamente por nombre",
+                "Por ciudad de A a Z"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. ORDER BY edad DESC ordena de mayor a menor edad.",
+                "incorrect": "DESC = descendente = de mayor a menor. El de mayor edad aparece primero."
+              }
+            },
+            {
+              "type": "table_reading",
+              "table": "Tabla: clientes\n id | nombre | ciudad    | edad\n----+--------+-----------+-----\n  1 | Ana    | CDMX      |  22\n  2 | Luis   | Monterrey |  17\n  3 | Karen  | CDMX      |  25\n  4 | Marta  | CDMX      |  15",
+              "prompt": "Con WHERE ciudad='CDMX' AND edad>=18, ORDER BY edad DESC, ¿cuál es la primera fila del resultado?",
+              "options": ["Ana (22)", "Luis (17)", "Karen (25)", "Marta (15)"],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. Karen y Ana cumplen el filtro. Con ORDER BY edad DESC, Karen (25) aparece primero.",
+                "incorrect": "Primero filtra: CDMX y edad>=18 → Ana (22) y Karen (25). Luego ordena DESC → Karen (25) primero."
+              }
+            },
+            {
+              "type": "info",
+              "title": "El orden de las cláusulas es obligatorio",
+              "body": "SQL no acepta las cláusulas en otro orden. SELECT va primero, luego FROM, luego WHERE (si lo hay), y ORDER BY siempre al final. Una cláusula fuera de lugar produce un error de sintaxis."
+            },
+            {
+              "type": "fill_blank",
+              "code": "SELECT nombre\nFROM clientes\nWHERE ciudad = 'CDMX'\n___ BY nombre ASC;",
+              "prompt": "¿Qué cláusula va para ordenar el resultado?",
+              "options": ["SORT", "GROUP", "ORDER", "FILTER"],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. ORDER BY va al final para indicar cómo ordenar el resultado.",
+                "incorrect": "En SQL la cláusula de ordenamiento es ORDER BY. No existe SORT BY en SQL estándar."
+              }
+            },
+            {
+              "type": "multiple_choice",
+              "code": "SELECT nombre, ciudad\nFROM clientes\nWHERE ciudad = 'CDMX' OR ciudad = 'Monterrey'\nORDER BY nombre ASC;",
+              "prompt": "¿Qué hace esta consulta?",
+              "options": [
+                "Devuelve solo clientes de CDMX ordenados por nombre",
+                "Devuelve clientes de CDMX o Monterrey, ordenados por nombre de A a Z",
+                "Devuelve todos los clientes ordenados por ciudad",
+                "Filtra y elimina los clientes de Monterrey"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. OR incluye CDMX y Monterrey; ORDER BY nombre ASC los ordena alfabéticamente.",
+                "incorrect": "OR devuelve los de CDMX o Monterrey. ORDER BY nombre ASC los ordena de A a Z."
+              }
+            },
+            {
+              "type": "debug",
+              "code": "SELECT nombre\nFROM clientes\nORDER BY nombre ASC\nWHERE ciudad = 'CDMX';",
+              "prompt": "Las cláusulas están en orden incorrecto. ¿Cuál es el error?",
+              "options": [
+                "SELECT debería ir después de FROM",
+                "ORDER BY está antes de WHERE — debería ir después",
+                "Falta AND entre las cláusulas",
+                "ASC debería escribirse ASCENDENTE"
+              ],
+              "correctIndex": 1,
+              "feedback": {
+                "correct": "Correcto. WHERE siempre va antes de ORDER BY. El orden correcto es: FROM → WHERE → ORDER BY.",
+                "incorrect": "El orden de cláusulas es obligatorio: SELECT → FROM → WHERE → ORDER BY. ORDER BY debe ir al final."
+              }
+            },
+            {
+              "type": "code_choice",
+              "prompt": "¿Cuál de estas consultas tiene la estructura completa correcta?",
+              "options": [
+                "FROM clientes SELECT nombre WHERE ciudad = 'CDMX' ORDER BY nombre;",
+                "SELECT nombre FROM clientes ORDER BY nombre WHERE ciudad = 'CDMX';",
+                "SELECT nombre FROM clientes WHERE ciudad = 'CDMX' ORDER BY nombre;",
+                "SELECT nombre WHERE ciudad = 'CDMX' FROM clientes ORDER BY nombre;"
+              ],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. SELECT → FROM → WHERE → ORDER BY es el orden obligatorio.",
+                "incorrect": "El orden correcto es: SELECT columnas FROM tabla WHERE condición ORDER BY columna."
+              }
+            },
+            {
+              "type": "debug",
+              "code": "SELECT nombre, ciudad\nFROM clientes\nWHERE ciudad = 'CDMX'\n  AND OR edad >= 18\nORDER BY nombre;",
+              "prompt": "Esta consulta tiene un error lógico. ¿Cuál es?",
+              "options": [
+                "Falta un punto y coma al final",
+                "AND y OR no pueden usarse en la misma consulta",
+                "AND OR juntos no es válido — debes elegir uno",
+                "WHERE no puede combinarse con ORDER BY"
+              ],
+              "correctIndex": 2,
+              "feedback": {
+                "correct": "Correcto. AND y OR no se escriben seguidos. Debes elegir uno para conectar las condiciones.",
+                "incorrect": "AND OR seguidos es un error. Usa solo AND o solo OR entre dos condiciones — no los dos a la vez."
+              }
+            },
+            {
+              "type": "summary",
+              "title": "Resumen — Consulta completa",
+              "points": [
+                "El orden obligatorio es: SELECT → FROM → WHERE → ORDER BY.",
+                "WHERE filtra filas; ORDER BY ordena el resultado filtrado.",
+                "Puedes combinar AND y OR en WHERE, pero nunca AND OR seguidos.",
+                "ASC ordena de menor a mayor (por defecto); DESC de mayor a menor.",
+                "Si el orden de cláusulas es incorrecto, SQL devuelve error de sintaxis."
+              ]
             }
-          },
-          "xp": 10
+          ],
+          "xp": 30
         },
         {
           "type": "practice",

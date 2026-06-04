@@ -1,16 +1,24 @@
 // src/components/layout/Navbar.jsx
 import { NavLink } from 'react-router-dom'
 import { useProgress } from '../../context/ProgressContext.jsx'
+import { useAuth } from '../../context/AuthContext.jsx'
 import './Navbar.css'
 
-const links = [
+const BASE_LINKS = [
   { to: '/', label: 'Inicio', icon: '🏠', end: true },
+  { to: '/repasar-errores', label: 'Repasar', icon: '🔖' },
   { to: '/perfil', label: 'Perfil', icon: '👤' },
   { to: '/ajustes', label: 'Ajustes', icon: '⚙️' },
 ]
 
 export default function Navbar() {
   const { progress } = useProgress()
+  const { user, loading } = useAuth()
+
+  // Solo mostrar "Entrar" cuando sabemos que no hay sesión (no durante la carga)
+  const links = (!loading && !user)
+    ? [...BASE_LINKS, { to: '/login', label: 'Entrar', icon: '🔑' }]
+    : BASE_LINKS
 
   return (
     <nav className="navbar">
