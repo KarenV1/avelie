@@ -1,0 +1,20 @@
+.settings__card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  padding: 22px;
+  margin-bottom: 16px;
+}
+.settings__card h3 { font-size: 1.15rem; margin-bottom: 6px; }
+.settings__card--danger { border-color: #5b2730; }
+
+.settings__metrics {
+  display: flex;
+  gap: 16px;
+  margin-top: 14px;
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.settings__confirm { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
+.settings__done { margin-top: 12px; color: var(--lime); font-weight: 700; animation: pop 0.3s ease both; }

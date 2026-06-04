@@ -1,0 +1,386 @@
+{
+  "id": "sql-basico",
+  "title": "SQL Básico",
+  "subtitle": "Consulta bases de datos relacionales",
+  "description": "Aprende a leer y filtrar datos con SELECT, WHERE, ORDER BY, agregaciones y GROUP BY.",
+  "icon": "🗄️",
+  "accent": "teal",
+  "language": "sql",
+  "units": [
+    {
+      "id": "u1",
+      "title": "Fundamentos de consultas",
+      "summary": "Lo esencial para pedir y filtrar datos.",
+      "items": [
+        {
+          "type": "block",
+          "id": "b1",
+          "title": "¿Qué es SQL?",
+          "explanation": "SQL (Structured Query Language) es el lenguaje estándar para hablar con bases de datos relacionales. Con él pides datos, los filtras y los modificas escribiendo instrucciones llamadas consultas (queries).",
+          "example": {
+            "code": "-- Una consulta pide información a la base de datos\nSELECT * FROM usuarios;",
+            "caption": "Esta consulta pide todos los datos de la tabla usuarios."
+          },
+          "question": {
+            "prompt": "¿Para qué sirve principalmente SQL?",
+            "options": [
+              "Diseñar interfaces gráficas",
+              "Comunicarse con bases de datos relacionales",
+              "Editar imágenes",
+              "Compilar programas en Java"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "¡Exacto! SQL es el idioma de las bases de datos relacionales.",
+              "incorrect": "No del todo: SQL sirve para consultar y manipular datos en bases relacionales."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "b2",
+          "title": "Tablas, filas y columnas",
+          "explanation": "Los datos viven en tablas. Cada tabla tiene columnas (los campos, como nombre o edad) y filas (cada registro individual, como un usuario concreto).",
+          "example": {
+            "code": "Tabla: usuarios\n id | nombre | edad\n----+--------+-----\n  1 | Ana    | 25\n  2 | Luis   | 17",
+            "caption": "id, nombre y edad son columnas; cada renglón es una fila."
+          },
+          "question": {
+            "prompt": "En una tabla, ¿qué representa una fila?",
+            "options": [
+              "Un campo o atributo",
+              "Un registro individual",
+              "El nombre de la tabla",
+              "Una base de datos completa"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "¡Correcto! Cada fila es un registro completo.",
+              "incorrect": "Recuerda: una fila es un registro; las columnas son los campos."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "b3",
+          "title": "SELECT básico",
+          "explanation": "La instrucción SELECT se usa para leer datos. SELECT * FROM tabla devuelve todas las columnas (*) de todas las filas de esa tabla.",
+          "example": {
+            "code": "SELECT * FROM usuarios;",
+            "caption": "El asterisco (*) significa “todas las columnas”."
+          },
+          "question": {
+            "prompt": "¿Qué devuelve SELECT * FROM productos;?",
+            "options": [
+              "Solo la primera fila",
+              "Todas las columnas y filas de productos",
+              "Solo los nombres de las columnas",
+              "Nada, da error"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "¡Eso es! Devuelve todo el contenido de la tabla.",
+              "incorrect": "El * trae todas las columnas, y sin WHERE trae todas las filas."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "b4",
+          "title": "Seleccionar columnas específicas",
+          "explanation": "En lugar de * puedes nombrar las columnas que quieres, separadas por comas. Así pides solo lo necesario y la consulta es más clara.",
+          "example": {
+            "code": "SELECT nombre, edad FROM usuarios;",
+            "caption": "Devuelve únicamente las columnas nombre y edad."
+          },
+          "question": {
+            "prompt": "¿Cómo pides solo las columnas nombre y email?",
+            "options": [
+              "SELECT * FROM usuarios;",
+              "SELECT nombre email FROM usuarios;",
+              "SELECT nombre, email FROM usuarios;",
+              "GET nombre, email FROM usuarios;"
+            ],
+            "correctIndex": 2,
+            "feedback": {
+              "correct": "¡Bien! Las columnas se separan con comas.",
+              "incorrect": "Las columnas van separadas por coma: SELECT nombre, email."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "b5",
+          "title": "La cláusula WHERE",
+          "explanation": "WHERE filtra las filas según una condición. Solo se devuelven las filas que cumplen esa condición.",
+          "example": {
+            "code": "SELECT nombre FROM usuarios\nWHERE edad >= 18;",
+            "caption": "Devuelve los nombres de los usuarios mayores de edad."
+          },
+          "question": {
+            "prompt": "¿Qué hace la cláusula WHERE?",
+            "options": [
+              "Ordena los resultados",
+              "Filtra filas según una condición",
+              "Cuenta filas",
+              "Une dos tablas"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "¡Correcto! WHERE deja pasar solo las filas que cumplen la condición.",
+              "incorrect": "WHERE filtra: solo conserva las filas que cumplen la condición."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "b6",
+          "title": "Operadores de comparación",
+          "explanation": "Dentro de WHERE usas operadores: = (igual), <> o != (distinto), > , < , >= y <=. Sirven para comparar valores.",
+          "example": {
+            "code": "SELECT nombre FROM usuarios\nWHERE edad > 30;",
+            "caption": "Usuarios con más de 30 años."
+          },
+          "question": {
+            "prompt": "¿Qué operador significa “distinto de” en SQL?",
+            "options": ["==", "<>", "!==", "><"],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "¡Sí! <> (o !=) significa distinto.",
+              "incorrect": "En SQL “distinto de” se escribe <> (también se acepta !=)."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "practice",
+          "id": "p1",
+          "title": "Tu primera consulta con WHERE",
+          "scenario": "Trabajas con la tabla usuarios(id, nombre, email, edad, pais). Marketing necesita la lista de usuarios adultos.",
+          "instructions": [
+            "Selecciona las columnas nombre y email.",
+            "Trae los datos desde la tabla usuarios.",
+            "Filtra para incluir solo usuarios con edad mayor a 18.",
+            "Pulsa Ejecutar para ver el resultado y Validar para comprobarlo."
+          ],
+          "initialCode": "SELECT \nFROM usuarios;",
+          "validators": [
+            "select",
+            "nombre",
+            "email",
+            "from\\s+usuarios",
+            "where",
+            "edad\\s*>\\s*18"
+          ],
+          "mockOutput": {
+            "columns": ["nombre", "email"],
+            "rows": [
+              ["Ana", "ana@mail.com"],
+              ["Luis", "luis@mail.com"],
+              ["Marta", "marta@mail.com"]
+            ]
+          },
+          "hints": [
+            "Las columnas van separadas por coma después de SELECT: SELECT nombre, email",
+            "Recuerda añadir la cláusula WHERE para filtrar.",
+            "La condición es: WHERE edad > 18"
+          ],
+          "successMessage": "¡Perfecto! Filtraste correctamente a los usuarios adultos. 🎉",
+          "failMessage": "Aún no. Revisa que selecciones nombre y email, y que filtres con WHERE edad > 18.",
+          "xp": 40
+        },
+        {
+          "type": "block",
+          "id": "b7",
+          "title": "Ordenar con ORDER BY",
+          "explanation": "ORDER BY ordena el resultado por una o varias columnas. ASC es ascendente (por defecto) y DESC descendente.",
+          "example": {
+            "code": "SELECT nombre, edad FROM usuarios\nORDER BY edad DESC;",
+            "caption": "Del más viejo al más joven."
+          },
+          "question": {
+            "prompt": "¿Qué hace ORDER BY edad DESC?",
+            "options": [
+              "Filtra por edad",
+              "Ordena de mayor a menor edad",
+              "Ordena de menor a mayor edad",
+              "Elimina la columna edad"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "¡Exacto! DESC ordena de mayor a menor.",
+              "incorrect": "DESC = descendente, es decir, de mayor a menor."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "b8",
+          "title": "Limitar resultados con LIMIT",
+          "explanation": "LIMIT restringe cuántas filas devuelve la consulta. Es útil para ver una muestra o el “top N”.",
+          "example": {
+            "code": "SELECT nombre FROM usuarios\nORDER BY edad DESC\nLIMIT 3;",
+            "caption": "Los 3 usuarios de mayor edad."
+          },
+          "question": {
+            "prompt": "¿Para qué sirve LIMIT 5?",
+            "options": [
+              "Devuelve como máximo 5 filas",
+              "Filtra edades menores a 5",
+              "Ordena 5 columnas",
+              "Borra 5 filas"
+            ],
+            "correctIndex": 0,
+            "feedback": {
+              "correct": "¡Bien! LIMIT acota el número de filas devueltas.",
+              "incorrect": "LIMIT N devuelve como máximo N filas."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "b9",
+          "title": "Combinar condiciones: AND y OR",
+          "explanation": "Puedes combinar varias condiciones en WHERE. AND exige que se cumplan todas; OR exige que se cumpla al menos una.",
+          "example": {
+            "code": "SELECT nombre FROM usuarios\nWHERE edad > 18 AND pais = 'MX';",
+            "caption": "Mayores de 18 Y de México."
+          },
+          "question": {
+            "prompt": "Con WHERE a AND b, una fila aparece cuando…",
+            "options": [
+              "Se cumple a o b",
+              "Se cumplen a y b a la vez",
+              "No se cumple ninguna",
+              "Siempre aparece"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "¡Correcto! AND exige que ambas condiciones sean verdaderas.",
+              "incorrect": "AND requiere que TODAS las condiciones se cumplan a la vez."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "b10",
+          "title": "Buscar texto con LIKE",
+          "explanation": "LIKE busca texto por patrón. El comodín % representa cualquier secuencia de caracteres y _ representa un solo carácter.",
+          "example": {
+            "code": "SELECT nombre FROM usuarios\nWHERE nombre LIKE 'A%';",
+            "caption": "Nombres que empiezan con A."
+          },
+          "question": {
+            "prompt": "¿Qué selecciona LIKE 'A%'?",
+            "options": [
+              "Nombres exactamente iguales a A",
+              "Nombres que terminan en A",
+              "Nombres que empiezan con A",
+              "Nombres de un solo carácter"
+            ],
+            "correctIndex": 2,
+            "feedback": {
+              "correct": "¡Sí! % al final captura cualquier cosa después de la A.",
+              "incorrect": "'A%' = empieza con A, seguido de cualquier texto (%)."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "b11",
+          "title": "Contar con COUNT",
+          "explanation": "Las funciones de agregación resumen datos. COUNT(*) cuenta filas; también existen SUM, AVG, MIN y MAX para sumar, promediar o hallar extremos.",
+          "example": {
+            "code": "SELECT COUNT(*) FROM usuarios;",
+            "caption": "Cuántos usuarios hay en total."
+          },
+          "question": {
+            "prompt": "¿Qué devuelve COUNT(*)?",
+            "options": [
+              "La suma de una columna",
+              "El número de filas",
+              "El promedio de edad",
+              "El primer nombre"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "¡Correcto! COUNT(*) cuenta filas.",
+              "incorrect": "COUNT(*) devuelve cuántas filas hay."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "block",
+          "id": "b12",
+          "title": "Agrupar con GROUP BY",
+          "explanation": "GROUP BY agrupa filas que comparten un valor y permite aplicar una agregación a cada grupo, por ejemplo contar usuarios por país.",
+          "example": {
+            "code": "SELECT pais, COUNT(*)\nFROM usuarios\nGROUP BY pais;",
+            "caption": "Cuántos usuarios hay en cada país."
+          },
+          "question": {
+            "prompt": "¿Qué hace GROUP BY pais junto con COUNT(*)?",
+            "options": [
+              "Cuenta el total ignorando el país",
+              "Cuenta usuarios dentro de cada país",
+              "Ordena por país",
+              "Borra duplicados de país"
+            ],
+            "correctIndex": 1,
+            "feedback": {
+              "correct": "¡Exacto! Cuenta filas por cada grupo de país.",
+              "incorrect": "GROUP BY crea grupos; COUNT(*) cuenta dentro de cada grupo."
+            }
+          },
+          "xp": 10
+        },
+        {
+          "type": "practice",
+          "id": "p2",
+          "title": "Contar usuarios por país",
+          "scenario": "Mismo dataset usuarios(id, nombre, email, edad, pais). Necesitas saber cuántos usuarios hay en cada país.",
+          "instructions": [
+            "Selecciona la columna pais y el conteo de filas con COUNT(*).",
+            "Usa la tabla usuarios.",
+            "Agrupa los resultados por país con GROUP BY.",
+            "Ejecuta para ver la tabla y luego valida."
+          ],
+          "initialCode": "SELECT \nFROM usuarios;",
+          "validators": [
+            "select",
+            "pais",
+            "count\\s*\\(\\s*\\*\\s*\\)",
+            "from\\s+usuarios",
+            "group\\s+by\\s+pais"
+          ],
+          "mockOutput": {
+            "columns": ["pais", "count"],
+            "rows": [
+              ["MX", "3"],
+              ["ES", "2"],
+              ["AR", "1"]
+            ]
+          },
+          "hints": [
+            "En el SELECT necesitas dos cosas: pais y COUNT(*).",
+            "No olvides GROUP BY al final de la consulta.",
+            "Se agrupa por la misma columna que seleccionas: GROUP BY pais"
+          ],
+          "successMessage": "¡Excelente! Dominas la agregación con GROUP BY. 🚀",
+          "failMessage": "Casi. Asegúrate de incluir COUNT(*) y GROUP BY pais.",
+          "xp": 60
+        }
+      ]
+    }
+  ]
+}

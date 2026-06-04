@@ -1,0 +1,9 @@
+# Claude Code — configuración local del entorno
+.claude/settings.local.json
+
+# SO
+.DS_Store
+Thumbs.db
+
+# Logs sueltos en la raíz
+*.log

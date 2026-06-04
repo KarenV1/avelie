@@ -1,0 +1,93 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(14, 16, 24, 0.82);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.navbar__inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.navbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+.navbar__logo {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--lime);
+  background: var(--surface-2);
+  padding: 4px 9px;
+  border-radius: 9px;
+  font-size: 0.9rem;
+}
+.navbar__name { font-size: 1.05rem; letter-spacing: -0.03em; }
+
+.navbar__stats {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.stat-chip {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--border-soft);
+}
+.stat-chip--streak { color: var(--amber); }
+.stat-chip--xp { color: var(--gold); }
+
+.navbar__links { display: flex; gap: 4px; }
+
+.navbar__link {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: var(--r-pill);
+  color: var(--text-faint);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.navbar__link:hover { color: var(--text); background: var(--surface); }
+.navbar__link--active { color: var(--text); background: var(--surface-2); }
+.navbar__icon { font-size: 1.05rem; }
+
+/* ---- Móvil: barra inferior fija ---- */
+@media (max-width: 620px) {
+  .navbar {
+    position: fixed;
+    bottom: 0;
+    top: auto;
+    width: 100%;
+    border-bottom: none;
+    border-top: 1px solid var(--border-soft);
+  }
+  .navbar__inner { padding: 10px 16px; }
+  .navbar__brand,
+  .navbar__stats { display: none; }
+  .navbar__links {
+    width: 100%;
+    justify-content: space-around;
+  }
+  .navbar__link { flex-direction: column; gap: 2px; font-size: 0.7rem; padding: 4px 10px; }
+  .navbar__icon { font-size: 1.3rem; }
+}
+
+/* En móvil mostramos las estadísticas en un encabezado propio dentro de cada página */
