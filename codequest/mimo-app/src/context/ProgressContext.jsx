@@ -48,6 +48,20 @@ export function ProgressProvider({ children }) {
     return itemIds.filter((id) => done[id]).length
   }
 
+  // Persiste el conteo de errores de un bloque (para repaso posterior)
+  function saveErrors(courseId, blockId, count) {
+    setProgress((prev) => ({
+      ...prev,
+      errors: {
+        ...(prev.errors || {}),
+        [courseId]: {
+          ...((prev.errors || {})[courseId] || {}),
+          [blockId]: count,
+        },
+      },
+    }))
+  }
+
   function resetProgress() {
     clearProgress()
     setProgress(loadProgress())
@@ -59,6 +73,7 @@ export function ProgressProvider({ children }) {
       completeItem,
       isCompleted,
       countCompleted,
+      saveErrors,
       resetProgress,
     }),
     [progress],

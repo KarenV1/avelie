@@ -86,8 +86,9 @@
     width: 100%;
     justify-content: space-around;
   }
-  .navbar__link { flex-direction: column; gap: 2px; font-size: 0.7rem; padding: 4px 10px; }
-  .navbar__icon { font-size: 1.3rem; }
+  .navbar__link { flex-direction: column; gap: 2px; padding: 6px 14px; }
+  .navbar__icon { font-size: 1.5rem; }
+  .navbar__label { display: none; }
 }
 
 /* En móvil mostramos las estadísticas en un encabezado propio dentro de cada página */

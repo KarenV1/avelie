@@ -8,6 +8,7 @@ export const defaultProgress = {
   xp: 0,
   streak: { count: 0, lastActiveDate: null }, // lastActiveDate en formato YYYY-MM-DD
   completed: {}, // { [courseId]: { [itemId]: true } }
+  errors: {},    // { [courseId]: { [blockId]: count } } — errores acumulados por bloque
 }
 
 export function loadProgress() {
@@ -21,6 +22,7 @@ export function loadProgress() {
       ...parsed,
       streak: { ...defaultProgress.streak, ...(parsed.streak || {}) },
       completed: parsed.completed || {},
+      errors: parsed.errors || {},
     }
   } catch (err) {
     console.warn('No se pudo leer el progreso, se reinicia.', err)
