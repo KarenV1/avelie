@@ -29,6 +29,9 @@ export function ProgressProvider({ children }) {
   // sin disparar la carga en cada re-render
   const prevUserIdRef = useRef(null)
 
+  // true mientras loadUserProgress + loadUserMistakes están en vuelo al hacer login
+  const [remoteLoading, setRemoteLoading] = useState(false)
+
   // ── Persistir localmente en cada cambio ─────────────────────────────────
   useEffect(() => {
     saveProgress(progress)
@@ -46,6 +49,7 @@ export function ProgressProvider({ children }) {
     if (user.id === prevUserIdRef.current) return // ya cargamos este usuario
 
     prevUserIdRef.current = user.id
+    setRemoteLoading(true)
 
     Promise.all([
       loadUserProgress(user.id),
@@ -61,6 +65,7 @@ export function ProgressProvider({ children }) {
         })
       })
       .catch((err) => console.warn('No se pudo cargar progreso de Supabase:', err))
+      .finally(() => setRemoteLoading(false))
   }, [user, authLoading])
 
   // ── Marcar item completado ───────────────────────────────────────────────
@@ -138,13 +143,14 @@ export function ProgressProvider({ children }) {
   const value = useMemo(
     () => ({
       progress,
+      remoteLoading,
       completeItem,
       isCompleted,
       countCompleted,
       saveErrors,
       resetProgress,
     }),
-    [progress],
+    [progress, remoteLoading],
   )
 
   return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>
