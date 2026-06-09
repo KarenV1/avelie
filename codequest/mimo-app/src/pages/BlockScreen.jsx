@@ -1,5 +1,5 @@
 // src/pages/BlockScreen.jsx
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { getCourse, getUnit } from '../data/courses/index.js'
 import { useProgress } from '../context/ProgressContext.jsx'
@@ -43,6 +43,10 @@ export default function BlockScreen() {
   const [totalErrors, setTotalErrors] = useState(0)
   const [phase, setPhase]             = useState('playing') // 'playing' | 'complete'
   const [isReview, setIsReview]       = useState(false)
+
+  // Acumula detalles por pregunta fallida (primera pasada únicamente).
+  // Se pasa a saveErrors al completar el bloque para el sync a Supabase.
+  const wrongQuestionsRef = useRef([])
 
   if (!block || block.type !== 'block') {
     return (
@@ -92,7 +96,7 @@ export default function BlockScreen() {
       setChecked(false)
     } else {
       completeItem(courseId, block.id, block.xp)
-      saveErrors(courseId, block.id, totalErrors)
+      saveErrors(courseId, block.id, totalErrors, wrongQuestionsRef.current)
       setPhase('complete')
       setSelected(null)
       setChecked(false)
@@ -103,7 +107,15 @@ export default function BlockScreen() {
   function handleCheckSteps() {
     setChecked(true)
     if (selected !== activeStep.correctIndex) {
-      if (!isReview) setWrong((prev) => [...prev, queue[qPos]])
+      if (!isReview) {
+        setWrong((prev) => [...prev, queue[qPos]])
+        wrongQuestionsRef.current.push({
+          questionId: activeStep.id ?? `${block.id}_q${queue[qPos]}`,
+          prompt:     activeStep.prompt ?? activeStep.text ?? null,
+          topic:      block.topic ?? null,
+          unitId,
+        })
+      }
       setTotalErrors((prev) => prev + 1)
     }
   }
@@ -112,7 +124,15 @@ export default function BlockScreen() {
   function handleCheckMulti() {
     setChecked(true)
     if (selected !== activeQ.correctIndex) {
-      if (!isReview) setWrong((prev) => [...prev, queue[qPos]])
+      if (!isReview) {
+        setWrong((prev) => [...prev, queue[qPos]])
+        wrongQuestionsRef.current.push({
+          questionId: activeQ.id ?? `${block.id}_q${queue[qPos]}`,
+          prompt:     activeQ.prompt ?? null,
+          topic:      block.topic ?? null,
+          unitId,
+        })
+      }
       setTotalErrors((prev) => prev + 1)
     }
   }

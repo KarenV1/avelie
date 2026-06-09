@@ -13,6 +13,9 @@ import {
   syncCompleteItem,
   loadUserProgress,
   mergeProgress,
+  syncMistake,
+  loadUserMistakes,
+  mergeErrors,
 } from '../utils/supabaseProgress.js'
 import { useAuth } from './AuthContext.jsx'
 
@@ -44,10 +47,18 @@ export function ProgressProvider({ children }) {
 
     prevUserIdRef.current = user.id
 
-    loadUserProgress(user.id)
-      .then((remote) => {
-        if (!remote) return
-        setProgress((prev) => mergeProgress(prev, remote))
+    Promise.all([
+      loadUserProgress(user.id),
+      loadUserMistakes(user.id),
+    ])
+      .then(([remote, remoteMistakes]) => {
+        setProgress((prev) => {
+          let next = remote ? mergeProgress(prev, remote) : prev
+          if (remoteMistakes && Object.keys(remoteMistakes).length > 0) {
+            next = { ...next, errors: mergeErrors(next.errors || {}, remoteMistakes) }
+          }
+          return next
+        })
       })
       .catch((err) => console.warn('No se pudo cargar progreso de Supabase:', err))
   }, [user, authLoading])
@@ -89,8 +100,10 @@ export function ProgressProvider({ children }) {
     return itemIds.filter((id) => done[id]).length
   }
 
-  // Persiste el conteo de errores de un bloque (para repaso posterior)
-  function saveErrors(courseId, blockId, count) {
+  // Persiste el conteo de errores de un bloque (para repaso posterior).
+  // failedQuestions: array de { questionId, prompt, topic, unitId } — solo se
+  // usa para el sync a Supabase; localStorage sigue recibiendo el count agregado.
+  function saveErrors(courseId, blockId, count, failedQuestions = []) {
     if (count === 0) return
     setProgress((prev) => ({
       ...prev,
@@ -102,6 +115,19 @@ export function ProgressProvider({ children }) {
         },
       },
     }))
+
+    if (user && failedQuestions.length > 0) {
+      for (const q of failedQuestions) {
+        syncMistake({
+          courseId,
+          unitId:     q.unitId     ?? null,
+          blockId,
+          questionId: q.questionId,
+          prompt:     q.prompt     ?? null,
+          topic:      q.topic      ?? null,
+        }).catch((err) => console.warn('syncMistake falló:', err))
+      }
+    }
   }
 
   function resetProgress() {
