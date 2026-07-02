@@ -1,0 +1,54 @@
+.byte-mascot {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* El asset es un PNG transparente: contain, nunca cover — Byte jamás se recorta */
+.byte-mascot__img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center center;
+  transition: filter var(--t-base, 240ms) ease;
+  /* Sombra de apoyo + halo dorado sutil: la silueta se lee sobre cualquier fondo */
+  filter:
+    drop-shadow(0 3px 6px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 0 10px rgba(245, 200, 0, 0.18));
+}
+
+/* Los moods solo ajustan brillo/intensidad del halo.
+   Nunca hue-rotate ni recolorear: el diseño de Byte no se toca. */
+.byte-mascot--happy .byte-mascot__img {
+  filter:
+    drop-shadow(0 3px 6px rgba(0, 0, 0, 0.5))
+    drop-shadow(0 0 12px rgba(245, 200, 0, 0.4));
+}
+
+.byte-mascot--sad .byte-mascot__img {
+  filter:
+    saturate(0.85) brightness(0.94)
+    drop-shadow(0 3px 6px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 0 8px rgba(245, 200, 0, 0.12));
+}
+
+.byte-mascot--celebrate .byte-mascot__img {
+  filter:
+    brightness(1.08)
+    drop-shadow(0 3px 8px rgba(0, 0, 0, 0.5))
+    drop-shadow(0 0 22px rgba(245, 200, 0, 0.55));
+}
+
+.byte-mascot--hint .byte-mascot__img {
+  filter:
+    drop-shadow(0 3px 6px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 0 12px rgba(245, 200, 0, 0.35));
+}
+
+/* Compat: variante antigua; con PNG transparente el radio ya no recorta nada */
+.byte-mascot--portrait { border-radius: var(--r-md); }
+
+@media (prefers-reduced-motion: reduce) {
+  .byte-mascot__img { transition: none; }
+}
