@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import { useProgress } from '../context/ProgressContext.jsx'
 import { getCourse } from '../data/courses/index.js'
 import Button from '../components/common/Button.jsx'
+import ByteMascot from '../components/common/ByteMascot.jsx'
+import '../components/common/ByteMascot.css'
 import './Profile.css'
 
 // Compatibilidad con formato antiguo (número) y nuevo ({ count, lastWrongAt })
@@ -56,9 +58,12 @@ export default function MistakesReview() {
   if (remoteLoading && cards.length === 0) {
     return (
       <main className="container">
-        <h1 className="section-title" style={{ marginBottom: 8 }}>Repasar errores</h1>
-        <div className="rise" style={{ marginTop: 60, textAlign: 'center' }}>
-          <p className="faint">Cargando errores...</p>
+        <header className="page-head rise">
+          <p className="section-title">Modo Debug</p>
+          <h1 className="page-head__title">Repasar errores</h1>
+        </header>
+        <div className="rise" style={{ marginTop: 40, textAlign: 'center' }}>
+          <p className="faint">Escaneando bugs…</p>
         </div>
       </main>
     )
@@ -67,12 +72,15 @@ export default function MistakesReview() {
   if (cards.length === 0) {
     return (
       <main className="container">
-        <h1 className="section-title" style={{ marginBottom: 8 }}>Repasar errores</h1>
-        <div className="rise" style={{ marginTop: 60, textAlign: 'center' }}>
-          <p style={{ fontSize: '2.5rem', marginBottom: 12 }}>🎯</p>
-          <p className="quiz__prompt">¡Sin errores por repasar!</p>
-          <p className="faint" style={{ marginTop: 8 }}>
-            Completa algún bloque para ver tus áreas de mejora aquí.
+        <header className="page-head rise">
+          <p className="section-title">Modo Debug</p>
+          <h1 className="page-head__title">Repasar errores</h1>
+        </header>
+        <div className="rise" style={{ marginTop: 32, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
+          <ByteMascot size={96} mood="celebrate" />
+          <p className="quiz__prompt" style={{ marginTop: 8 }}>¡Cero bugs! Todo depurado.</p>
+          <p className="faint">
+            Cuando falles una pregunta, aparecerá aquí para que la caces con Byte.
           </p>
         </div>
       </main>
@@ -81,11 +89,15 @@ export default function MistakesReview() {
 
   return (
     <main className="container">
-      <header style={{ marginBottom: 20 }}>
-        <h1 className="section-title">Repasar errores</h1>
-        <p className="faint">
-          {cards.length} bloque{cards.length !== 1 ? 's' : ''} con errores pendientes
-        </p>
+      <header className="page-head rise" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <ByteMascot size={56} mood="default" />
+        <div>
+          <p className="section-title" style={{ marginBottom: 0 }}>Modo Debug</p>
+          <h1 className="page-head__title">Repasar errores</h1>
+          <p className="faint" style={{ marginTop: 4 }}>
+            {cards.length} bloque{cards.length !== 1 ? 's' : ''} por depurar
+          </p>
+        </div>
       </header>
 
       <div className="stack">
@@ -118,7 +130,7 @@ export default function MistakesReview() {
                   <span style={{
                     fontSize: '0.75rem',
                     background: 'var(--surface-2)',
-                    color: 'var(--amber)',
+                    color: 'var(--text-dim)',
                     borderRadius: 'var(--r-sm)',
                     padding: '2px 8px',
                   }}>
