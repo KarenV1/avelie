@@ -1,0 +1,751 @@
+/* ═══════════════════════════════════════════════════════════
+   COURSE SCREEN — Mapa del Mundo
+   El camino es el protagonista.
+   Los nodos son estaciones, no tarjetas.
+   Byte camina sobre el circuito.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Header de página ──────────────────────────────────────── */
+.cmap-page {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.cmap__page-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 12px;
+  background: rgba(10, 9, 0, 0.94);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.cmap__page-back,
+.cmap__page-settings {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  transition: color 0.15s ease;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+.cmap__page-back:hover,
+.cmap__page-settings:hover { color: var(--text); }
+
+.cmap__page-title {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+/* ── Cabecera de progreso del mundo ───────────────────────── */
+.cmap__head {
+  padding: 18px 0 12px;
+}
+
+.cmap__title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.cmap__world-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-md);
+}
+
+.cmap__pct-block {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.cmap__pct-num {
+  font-family: var(--font-pixel);
+  font-size: 1.7rem;
+  line-height: 1;
+  color: var(--gold);
+}
+
+.cmap__pct-sign {
+  font-family: var(--font-pixel);
+  font-size: 0.85rem;
+  color: var(--gold);
+  opacity: 0.7;
+}
+
+.cmap__bar-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cmap__bar-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   QMAP — El mapa del mundo en 2D
+   Contenedor posicionado en relativo.
+   Todos los hijos usan position: absolute.
+   ═══════════════════════════════════════════════════════════ */
+.qmap {
+  position: relative;
+  width: 100%;
+  margin-top: 8px;
+  overflow: visible;
+}
+
+/* ── SVG del circuito — ocupa todo el contenedor ── */
+.qmap__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Circuito de fondo (no completado) — apagado, punteado */
+.qmap__circuit-bg {
+  stroke: var(--surface-2);
+  stroke-dasharray: 4 8;
+  stroke-linecap: square;
+}
+
+/* Circuito completado — iluminado dorado */
+.qmap__circuit-done {
+  stroke: var(--gold);
+  opacity: 0.65;
+  stroke-linecap: square;
+  animation: circuit-pulse 3.5s ease-in-out infinite;
+}
+
+@keyframes circuit-pulse {
+  0%, 100% { opacity: 0.55; }
+  50%       { opacity: 0.85; }
+}
+
+/* Nodos de unión en ángulos (estética PCB) */
+.qmap__junc {
+  fill: var(--surface-2);
+  stroke: none;
+}
+
+.qmap__junc--done {
+  fill: var(--gold);
+  opacity: 0.75;
+  animation: junc-blink 2.8s ease-in-out infinite;
+}
+
+@keyframes junc-blink {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1;   }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BYTE — camina sobre el circuito
+   ═══════════════════════════════════════════════════════════ */
+.qmap__byte {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  pointer-events: none;
+  width: 52px;
+  height: 52px;
+}
+
+/* Animación sobre el wrapper de ByteMascot; el asset se renderiza vía componente */
+.qmap__byte .byte-mascot__img {
+  filter:
+    drop-shadow(0 3px 6px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 0 8px rgba(245, 200, 0, 0.45));
+  animation:
+    byte-appear 0.55s cubic-bezier(0.34, 1.55, 0.64, 1) both,
+    byte-float  3.8s ease-in-out 0.55s infinite;
+}
+
+/* Estela de píxeles por encima de Byte (donde viene en el circuito) */
+.qmap__byte-trail {
+  position: absolute;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  border-radius: 1px;
+  background: var(--gold);
+  transform: translateX(-50%);
+  top: calc(-1 * (calc(var(--d) * 7px) + 4px));
+  opacity: calc(0.65 - (var(--d) - 1) * 0.2);
+  animation: trail-fade calc(1.2s + var(--d) * 0.25s) ease-in-out calc(var(--d) * 0.12s) infinite;
+}
+
+@keyframes byte-appear {
+  from { opacity: 0; transform: scale(0.65) translateY(6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes byte-float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-5px); }
+}
+
+@keyframes trail-fade {
+  0%, 100% { opacity: calc(0.6 - (var(--d) - 1) * 0.2); }
+  50%       { opacity: calc(0.2 - (var(--d) - 1) * 0.05); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   COLECCIONABLES — entre nodos completados
+   ═══════════════════════════════════════════════════════════ */
+.qmap__col {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  pointer-events: none;
+}
+
+.qmap__col-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Recompensas del camino: formas distintas, un solo color de marca (design.md §2) */
+/* Crystal — diamante dorado */
+.qmap__col--crystal .qmap__col-icon {
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  background: linear-gradient(135deg, rgba(245, 200, 0, 0.9), rgba(200, 150, 0, 0.7));
+  box-shadow: 0 0 8px rgba(245, 200, 0, 0.5);
+  animation: crystal-spin 6s linear infinite, crystal-glow 2.5s ease-in-out infinite;
+}
+
+/* Cofre — rectángulo dorado profundo */
+.qmap__col--chest .qmap__col-icon {
+  width: 18px;
+  height: 14px;
+  background: linear-gradient(135deg, var(--gold), #8a6800);
+  border-radius: 2px;
+  border-top: 3px solid var(--gold);
+  box-shadow: 0 0 8px rgba(245, 200, 0, 0.4);
+  animation: chest-bob 2.2s ease-in-out infinite;
+}
+
+/* Portal — anillo dorado */
+.qmap__col--portal .qmap__col-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2.5px solid var(--gold);
+  box-shadow: 0 0 10px rgba(245, 200, 0, 0.45),
+              inset 0 0 6px rgba(245, 200, 0, 0.3);
+  animation: portal-rotate 3s linear infinite;
+}
+
+/* Desafío — triángulo dorado */
+.qmap__col--challenge .qmap__col-icon {
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  background: var(--gold);
+  box-shadow: 0 0 8px rgba(245, 200, 0, 0.4);
+  animation: challenge-flash 1.8s ease-in-out infinite;
+}
+
+@keyframes crystal-spin  { to { transform: rotate(360deg); } }
+@keyframes crystal-glow  { 0%, 100% { box-shadow: 0 0 8px rgba(245, 200, 0, 0.5); }
+                            50%      { box-shadow: 0 0 14px rgba(245, 200, 0, 0.8); } }
+@keyframes chest-bob     { 0%, 100% { transform: translateY(0); }
+                            50%      { transform: translateY(-3px); } }
+@keyframes portal-rotate { to { transform: rotate(360deg); } }
+@keyframes challenge-flash { 0%, 100% { opacity: 0.7; }
+                              50%       { opacity: 1; } }
+
+/* ═══════════════════════════════════════════════════════════
+   ELEMENTOS AMBIENTALES — detalles del mundo digital
+   ═══════════════════════════════════════════════════════════ */
+.qmap__amb {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.32;
+  animation: amb-drift calc(4s + var(--delay, 0s) * 0.8) ease-in-out var(--delay, 0s) infinite;
+}
+
+@keyframes amb-drift {
+  0%, 100% { opacity: 0.25; transform: translate(-50%, -50%) translateY(0); }
+  50%       { opacity: 0.48; transform: translate(-50%, -50%) translateY(-5px); }
+}
+
+.qmap__amb--cube {
+  width: 11px;
+  height: 11px;
+  border: 1px solid rgba(245, 200, 0, 0.28);
+  border-radius: 2px;
+  background: rgba(245, 200, 0, 0.03);
+}
+
+.qmap__amb--code {
+  font-family: var(--font-mono);
+  font-size: 7px;
+  color: rgba(245, 200, 0, 0.38);
+  white-space: nowrap;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+.qmap__amb--code::before { content: '</>'; }
+
+.qmap__amb--crystal {
+  width: 8px;
+  height: 8px;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  background: rgba(245, 200, 0, 0.32);
+  animation: amb-drift calc(3.5s + var(--delay, 0s) * 0.6) ease-in-out var(--delay, 0s) infinite,
+             crystal-spin 9s linear var(--delay, 0s) infinite !important;
+}
+
+.qmap__amb--bit {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: bit-blink calc(1.8s + var(--delay, 0s) * 0.4) ease-in-out var(--delay, 0s) infinite !important;
+}
+
+@keyframes bit-blink {
+  0%, 100% { opacity: 0.12; transform: translate(-50%, -50%) scale(1); }
+  50%       { opacity: 0.55; transform: translate(-50%, -50%) scale(1.5); }
+}
+
+.qmap__amb--terminal {
+  width: 14px;
+  height: 10px;
+  border: 1px solid rgba(245, 200, 0, 0.2);
+  border-radius: 1px;
+  background: rgba(245, 200, 0, 0.03);
+}
+.qmap__amb--terminal::before {
+  content: '';
+  display: block;
+  margin: 2px 3px;
+  height: 1px;
+  background: rgba(245, 200, 0, 0.28);
+}
+.qmap__amb--terminal::after {
+  content: '';
+  display: block;
+  margin: 1px 3px 0;
+  height: 1px;
+  width: 60%;
+  background: rgba(245, 200, 0, 0.16);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ESTACIONES — nodos del mapa
+   ═══════════════════════════════════════════════════════════ */
+.qmap__station {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 5;
+  cursor: default;
+}
+
+.qmap__station--done,
+.qmap__station--active,
+.qmap__station--open   { cursor: pointer; }
+.qmap__station--locked { cursor: default; opacity: 0.7; }
+
+/* Aura del nodo activo */
+.qmap__aura {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 200, 0, 0.14) 0%, transparent 70%);
+  animation: aura-breathe 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes aura-breathe {
+  0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1);    }
+  50%       { opacity: 1;   transform: translate(-50%, -50%) scale(1.18); }
+}
+
+/* ── Nodo hexagonal ── */
+.qmap__node {
+  position: relative;
+  z-index: 2;
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+  border: none;
+  background: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+.qmap__node:not(:disabled):hover {
+  transform: scale(1.1);
+  filter: brightness(1.15);
+}
+.qmap__node:disabled { cursor: default; }
+
+.qmap__node-ring {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+}
+
+.qmap__node-fill {
+  position: relative;
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.qmap__node-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.qmap__node-num {
+  font-family: var(--font-pixel);
+  font-size: 0.58rem;
+  line-height: 1;
+}
+
+/* ACTIVO */
+.qmap__node--active {
+  width: 64px;
+  height: 55px;
+  filter: drop-shadow(0 0 10px rgba(245, 200, 0, 0.5));
+  animation: node-pulse 2.8s ease-in-out infinite;
+}
+.qmap__node--active .qmap__node-ring {
+  background: var(--gold);
+}
+.qmap__node--active .qmap__node-fill {
+  width: 50px;
+  height: 43px;
+  background: #1a1200;
+  color: var(--gold);
+  font-size: 1rem;
+}
+
+@keyframes node-pulse {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(245, 200, 0, 0.4)); }
+  50%       { filter: drop-shadow(0 0 18px rgba(245, 200, 0, 0.75)); }
+}
+
+/* COMPLETADO */
+.qmap__node--done {
+  width: 48px;
+  height: 41px;
+  filter: drop-shadow(0 0 4px rgba(245, 200, 0, 0.25));
+}
+.qmap__node--done .qmap__node-ring {
+  background: var(--gold);
+}
+.qmap__node--done .qmap__node-fill {
+  width: 38px;
+  height: 33px;
+  background: color-mix(in srgb, var(--gold) 70%, #1a1200);
+  color: #1a1200;
+  font-size: 0.85rem;
+}
+
+/* ABIERTO */
+.qmap__node--open {
+  width: 48px;
+  height: 41px;
+}
+.qmap__node--open .qmap__node-ring {
+  background: var(--surface-2);
+}
+.qmap__node--open .qmap__node-fill {
+  width: 38px;
+  height: 33px;
+  background: color-mix(in srgb, var(--accent, var(--teal)) 16%, var(--surface));
+  color: color-mix(in srgb, var(--accent, var(--teal)) 85%, white);
+  font-size: 0.82rem;
+}
+
+/* BLOQUEADO */
+.qmap__node--locked {
+  width: 34px;
+  height: 30px;
+}
+.qmap__node--locked .qmap__node-ring {
+  background: color-mix(in srgb, var(--surface-2) 60%, var(--bg));
+}
+.qmap__node--locked .qmap__node-fill {
+  width: 26px;
+  height: 22px;
+  background: var(--bg);
+  color: var(--text-faint);
+  font-size: 0.7rem;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ETIQUETA — texto secundario
+   ═══════════════════════════════════════════════════════════ */
+.qmap__label {
+  position: absolute;
+  top: calc(100% + 7px);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  pointer-events: none;
+  z-index: 6;
+  min-width: 76px;
+  max-width: 108px;
+}
+
+.qmap__label--right {
+  left: calc(50% - 10px);
+  align-items: flex-start;
+  text-align: left;
+}
+.qmap__label--left {
+  right: calc(50% - 10px);
+  align-items: flex-end;
+  text-align: right;
+}
+
+.qmap__label-tag {
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  color: var(--text-faint);
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.qmap__label-name {
+  font-family: var(--font-display);
+  font-size: 0.67rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.qmap__station--active .qmap__label-tag  { color: rgba(245, 200, 0, 0.55); }
+.qmap__station--active .qmap__label-name { color: var(--text); font-weight: 700; }
+.qmap__station--done   .qmap__label-name { color: color-mix(in srgb, var(--gold) 50%, var(--text-dim)); }
+
+.qmap__label-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+  width: 100%;
+}
+.qmap__label-bar > .progress {
+  flex: 1;
+  width: auto;
+  height: 3px;
+}
+.qmap__label-count {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CPATH — el camino continuo por tramos de unidad
+   ═══════════════════════════════════════════════════════════ */
+.cpath__section--locked .qmap { opacity: 0.45; }
+
+/* Corte del camino: banda divisoria de unidad */
+.cpath__divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 0 6px;
+}
+
+.cpath__divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border-soft);
+}
+.cpath__divider--done .cpath__divider-line {
+  background: color-mix(in srgb, var(--gold) 35%, var(--border-soft));
+}
+
+.cpath__divider-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  text-align: center;
+  max-width: 70%;
+}
+
+.cpath__divider-tag {
+  font-family: var(--font-pixel);
+  font-size: 0.55rem;
+  color: var(--gold);
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+.cpath__divider-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--text);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.cpath__divider-hint {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  color: var(--text-faint);
+  line-height: 1.3;
+}
+
+.cpath__section--locked .cpath__divider-tag  { color: var(--text-faint); }
+.cpath__section--locked .cpath__divider-name { color: var(--text-dim); }
+
+/* Etiqueta centrada bajo el nodo activo */
+.qmap__label--under {
+  left: 50%;
+  transform: translateX(-50%);
+  align-items: center;
+  text-align: center;
+  min-width: 120px;
+  max-width: 170px;
+}
+
+/* ═══ Burbuja de preview ═══ */
+.cpath__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 60;
+  animation: cpath-fadein 0.18s ease both;
+}
+
+.cpath__sheet {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 86px;
+  width: calc(100% - 24px);
+  max-width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 18px 18px 16px;
+  z-index: 80;
+  box-shadow: var(--shadow-lg);
+  animation: cpath-sheet-up 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (min-width: 640px) {
+  .cpath__sheet { bottom: 32px; }
+}
+
+.cpath__sheet-tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+}
+
+.cpath__sheet-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-top: 6px;
+  color: var(--text);
+  line-height: 1.25;
+}
+
+.cpath__sheet-meta {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.cpath__sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+@keyframes cpath-sheet-up {
+  from { opacity: 0; transform: translate(-50%, 14px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+@keyframes cpath-fadein { from { opacity: 0; } to { opacity: 1; } }
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .cpath__backdrop,
+  .cpath__sheet { animation: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qmap__circuit-done,
+  .qmap__junc--done,
+  .qmap__byte .byte-mascot__img,
+  .qmap__byte-trail,
+  .qmap__aura,
+  .qmap__node--active,
+  .qmap__amb,
+  .qmap__col .qmap__col-icon { animation: none !important; }
+}

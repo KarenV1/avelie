@@ -50,6 +50,7 @@ export default function PracticeScreen() {
   }
 
   const unitPath = `/curso/${courseId}/unidad/${unitId}`
+  const coursePath = `/curso/${courseId}` // el camino continuo del curso
 
   function handleRun() {
     const ok = runValidators(code, practice.validators)
@@ -79,14 +80,14 @@ export default function PracticeScreen() {
 
   function goNext() {
     const next = unit.items[index + 1]
-    if (!next) return navigate(unitPath)
+    if (!next) return navigate(coursePath)
     const kind = next.type === 'practice' ? 'practica' : 'bloque'
     navigate(`${unitPath}/${kind}/${next.id}`)
   }
 
   return (
     <main className="container learn">
-      <Link to={unitPath} className="learn__back">‹ Volver a la unidad</Link>
+      <Link to={coursePath} className="learn__back">‹ Volver al camino</Link>
 
       <div className="practice">
         <aside className="practice__brief rise">
