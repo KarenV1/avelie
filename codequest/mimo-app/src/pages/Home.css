@@ -1,75 +1,431 @@
-.home__hero {
-  padding: 18px 0 6px;
-}
-.home__title {
-  font-size: clamp(1.8rem, 6vw, 2.6rem);
-  font-weight: 800;
-  margin: 6px 0 14px;
-}
-.home__hero-stats { display: flex; gap: 10px; flex-wrap: wrap; }
-.hero-chip {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.9rem;
-  padding: 8px 16px;
-  border-radius: var(--r-pill);
-  background: var(--surface);
-  box-shadow: inset 0 0 0 1px var(--border-soft);
+/* ═══════════════════════════════
+   SPLASH — primera pantalla
+═══════════════════════════════ */
+/* La bienvenida se muestra sin navbar (visitantes sin sesión): ocupa toda la pantalla */
+.splash {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 56px 24px 44px;
+  position: relative;
+  overflow: hidden;
+  gap: 0;
 }
 
-.home__courses {
-  display: grid;
+/* Brillo dorado difuso detrás de la mascota */
+.splash::before {
+  content: '';
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(245, 200, 0, 0.18) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Cabecera: título + subtítulo ── */
+.splash__header {
+  text-align: center;
+  z-index: 1;
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+
+.splash__brand {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 8vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+/* "Quest" en amarillo, "Code" en blanco */
+.splash__brand em {
+  color: var(--teal);
+  font-style: normal;
+}
+
+.splash__tagline {
+  font-size: 0.98rem;
+  color: var(--text-dim);
+  line-height: 1.45;
+}
+
+/* "SQL" destacado en amarillo */
+.splash__tagline strong {
+  color: var(--teal);
+  font-weight: 700;
+}
+
+/* ── Mascota — ocupa el espacio disponible entre título y botones ── */
+.splash__mascot-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  width: 100%;
+  min-height: 200px;
+}
+
+/* Refuerza el halo del mood happy para el protagonismo del splash */
+.splash__mascot .byte-mascot__img {
+  filter:
+    drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5))
+    drop-shadow(0 0 36px rgba(245, 200, 0, 0.5))
+    drop-shadow(0 24px 60px rgba(245, 160, 0, 0.25));
+}
+
+/* ── Botones ── */
+.splash__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 340px;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+/* Forma de píldora y borde más visible en el splash */
+.splash__actions .btn {
+  border-radius: var(--r-pill);
+  font-weight: 700;
+}
+
+.splash__actions .btn--ghost {
+  border-color: rgba(240, 235, 220, 0.22);
+  color: var(--text);
+}
+
+/* ═══════════════════════════════
+   DASHBOARD
+═══════════════════════════════ */
+
+/* Header de página — visible solo en mobile */
+.home__page-header {
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 44px;
+  margin-bottom: 8px;
+}
+
+.home__page-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.home__page-back {
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  padding: 8px;
+  margin-left: -8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+.home__page-back:hover { color: var(--text-dim); }
+
+@media (min-width: 640px) {
+  .home__page-header { display: none; }
+}
+
+/* Stats row */
+.home__stats {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.home__stat {
+  border-radius: var(--r-pill);
+  padding: 7px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+/* Progreso, racha y XP son logros: siempre en el dorado de marca (design.md §2) */
+.home__stat {
+  color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 10%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--gold) 28%, transparent);
+}
+.home__stat strong { font-weight: 800; }
+
+/* Greeting card — Byte se asoma desde el borde inferior (BytePeek, design.md §6) */
+.home__greeting {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  padding: 16px 12px 0 18px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.home__greeting-text { flex: 1; min-width: 0; padding-bottom: 16px; }
+
+.home__greeting-title {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.home__greeting-sub {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+  line-height: 1.45;
+}
+
+/* El asset "asomada" está dibujado asomándose: se ancla al borde inferior de la tarjeta */
+.home__greeting-byte {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  margin-right: 6px;
+}
+
+/* CTA — usa el Button primario compartido; solo se maneja el espaciado aquí */
+.home__cta-wrap { margin-bottom: 12px; }
+
+/* Tarjeta de curso activo — muestra posición exacta en el curso */
+.home__active-card {
+  display: flex;
+  align-items: center;
   gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  padding: 16px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: border-color 0.15s ease;
+}
+.home__active-card:hover { border-color: var(--teal); }
+
+.home__active-icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--teal) 12%, var(--surface-2));
+  border: 1px solid color-mix(in srgb, var(--teal) 22%, transparent);
+  border-radius: var(--r-md);
+  flex-shrink: 0;
+}
+
+.home__active-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.home__active-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.home__active-meta {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  line-height: 1.2;
+}
+
+.home__active-lesson {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.3;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.home__active-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+.home__active-progress > .progress { flex: 1; width: auto; }
+
+.home__active-pct {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--teal);
+  flex-shrink: 0;
+}
+
+.home__active-chevron {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--text-faint);
+  transition: color 0.15s ease;
+}
+.home__active-card:hover .home__active-chevron { color: var(--teal); }
+
+/* ═══════════════════════════════
+   LISTA DE CURSOS
+═══════════════════════════════ */
+.home__courses {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .course-card {
   --accent: var(--teal);
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   text-align: left;
   width: 100%;
   background: var(--surface);
   border: 1px solid var(--border-soft);
   border-radius: var(--r-lg);
-  padding: 18px;
+  padding: 14px 16px;
   color: var(--text);
-  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
-  position: relative;
-  overflow: hidden;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
 }
-.course-card::before {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 4px;
-  background: var(--accent);
-}
-.course-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent);
-  background: var(--bg-soft);
-}
+.course-card:hover { background: var(--surface-hover); border-color: var(--border); }
 
 .course-card__icon {
-  font-size: 2rem;
-  width: 58px;
-  height: 58px;
+  width: 48px;
+  height: 48px;
   display: grid;
   place-items: center;
-  background: var(--surface-2);
+  background: color-mix(in srgb, var(--accent, var(--teal)) 12%, var(--surface-2));
+  border: 1px solid color-mix(in srgb, var(--accent, var(--teal)) 20%, transparent);
   border-radius: var(--r-md);
   flex-shrink: 0;
-}
-.course-card__body { flex: 1; min-width: 0; }
-.course-card__title { font-size: 1.15rem; font-weight: 700; }
-.course-card__sub { font-size: 0.88rem; margin: 2px 0 10px; }
-.course-card__progress { display: flex; align-items: center; gap: 10px; }
-.course-card__count { font-size: 0.8rem; font-family: var(--font-display); font-weight: 700; }
-.course-card__chevron {
-  font-size: 1.8rem;
-  color: var(--text-faint);
-  font-family: var(--font-display);
+  font-size: 1.6rem;
 }
 
-.home__hint { font-size: 0.85rem; margin-top: 10px; text-align: center; }
+.course-card__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.course-card__title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.course-card__sub {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.3;
+}
+
+.course-card__pct {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+/* Tarjeta "agregar cursos" */
+.course-card--add {
+  border-style: dashed;
+  border-color: var(--border-soft);
+  opacity: 0.55;
+  cursor: default;
+}
+.course-card--add:hover { background: var(--surface); border-color: var(--border-soft); }
+
+/* Título de sección en amarillo (igual que referencia) */
+.home__section-title {
+  color: var(--teal);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+/* ═══════════════════════════════
+   COURSE SCREEN — header + unit cards
+═══════════════════════════════ */
+.home__hero {
+  padding: 4px 0 24px;
+}
+
+.home__title {
+  --accent: var(--teal);
+  font-family: var(--font-pixel);
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.8;
+  color: var(--accent);
+  margin: 10px 0 6px;
+}
+
+/* Progress row inside unit cards */
+.course-card__progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.course-card__count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Chevron arrow at end of unit cards */
+.course-card__chevron {
+  font-size: 1.2rem;
+  color: var(--text-faint);
+  flex-shrink: 0;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.course-card:hover .course-card__chevron {
+  color: var(--teal);
+  transform: translateX(2px);
+}

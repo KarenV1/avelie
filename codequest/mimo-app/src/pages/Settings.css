@@ -1,20 +1,49 @@
+/* ─── Tarjetas de ajustes ─── */
 .settings__card {
   background: var(--surface);
   border: 1px solid var(--border-soft);
   border-radius: var(--r-lg);
-  padding: 22px;
-  margin-bottom: 16px;
+  padding: 20px;
+  margin-bottom: 14px;
 }
-.settings__card h3 { font-size: 1.15rem; margin-bottom: 6px; }
-.settings__card--danger { border-color: #5b2730; }
 
+.settings__card h3 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.settings__card--danger {
+  border-color: color-mix(in srgb, var(--rose) 30%, var(--border-soft));
+}
+.settings__card--danger h3 { color: var(--rose); }
+
+/* ─── Métricas rápidas ─── */
 .settings__metrics {
   display: flex;
-  gap: 16px;
+  gap: 14px;
   margin-top: 14px;
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
   font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text-dim);
 }
 
-.settings__confirm { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
-.settings__done { margin-top: 12px; color: var(--lime); font-weight: 700; animation: pop 0.3s ease both; }
+/* ─── Confirmación de borrado ─── */
+.settings__confirm {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settings__done {
+  margin-top: 12px;
+  color: var(--lime);
+  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  animation: pop 0.3s ease both;
+}

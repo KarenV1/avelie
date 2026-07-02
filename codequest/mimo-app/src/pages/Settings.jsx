@@ -4,14 +4,14 @@ import { useNavigate } from 'react-router-dom'
 import { useProgress } from '../context/ProgressContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import Button from '../components/common/Button.jsx'
+import { IconFlame, IconStar } from '../components/common/icons.jsx'
 import './Settings.css'
 
 export default function Settings() {
   const { resetProgress, progress } = useProgress()
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
-  const [confirming, setConfirming] = useState(false)
-  const [done, setDone] = useState(false)
+  const [resetState, setResetState] = useState(null) // null | 'confirming' | 'done'
 
   async function handleSignOut() {
     await signOut()
@@ -20,16 +20,15 @@ export default function Settings() {
 
   function handleReset() {
     resetProgress()
-    setConfirming(false)
-    setDone(true)
-    setTimeout(() => setDone(false), 2500)
+    setResetState('done')
+    setTimeout(() => setResetState(null), 2500)
   }
 
   return (
     <main className="container">
-      <header className="rise" style={{ padding: '18px 0' }}>
+      <header className="page-head rise">
         <p className="section-title">Configuración</p>
-        <h1 style={{ fontSize: '1.7rem', fontWeight: 800, marginTop: 6 }}>Ajustes</h1>
+        <h1 className="page-head__title">Ajustes</h1>
       </header>
 
       {user ? (
@@ -56,8 +55,12 @@ export default function Settings() {
             : 'Tu progreso se guarda únicamente en este navegador (localStorage). No se envía a ningún servidor.'}
         </p>
         <div className="settings__metrics">
-          <span>⭐ {progress.xp} XP</span>
-          <span>🔥 {progress.streak.count} de racha</span>
+          <span style={{ color: 'var(--gold)' }}>
+            <IconStar style={{ width: '1em', height: '1em', verticalAlign: '-0.1em' }} /> {progress.xp} XP
+          </span>
+          <span style={{ color: 'var(--gold)' }}>
+            <IconFlame style={{ width: '1em', height: '1em', verticalAlign: '-0.1em' }} /> {progress.streak.count} de racha
+          </span>
         </div>
       </section>
 
@@ -67,23 +70,23 @@ export default function Settings() {
           Borra toda tu XP, racha y lecciones completadas. Esta acción no se puede deshacer.
         </p>
 
-        {!confirming && !done && (
-          <Button variant="danger" onClick={() => setConfirming(true)}>
+        {resetState === null && (
+          <Button variant="danger" onClick={() => setResetState('confirming')}>
             Reiniciar todo
           </Button>
         )}
 
-        {confirming && (
+        {resetState === 'confirming' && (
           <div className="settings__confirm">
             <p>¿Seguro? Se perderá todo tu progreso.</p>
             <div className="row">
               <Button variant="danger" onClick={handleReset}>Sí, borrar</Button>
-              <Button variant="ghost" onClick={() => setConfirming(false)}>Cancelar</Button>
+              <Button variant="ghost" onClick={() => setResetState(null)}>Cancelar</Button>
             </div>
           </div>
         )}
 
-        {done && <p className="settings__done">✓ Progreso reiniciado.</p>}
+        {resetState === 'done' && <p className="settings__done">✓ Progreso reiniciado.</p>}
       </section>
 
       <p className="faint" style={{ textAlign: 'center', marginTop: 24, fontSize: '0.82rem' }}>

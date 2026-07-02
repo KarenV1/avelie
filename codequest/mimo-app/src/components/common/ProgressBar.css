@@ -7,11 +7,10 @@
 
 .progress__track {
   flex: 1;
-  height: 12px;
+  height: 6px;
   background: var(--surface-2);
   border-radius: var(--r-pill);
   overflow: hidden;
-  box-shadow: inset 0 0 0 1px var(--border-soft);
 }
 
 .progress__fill {
@@ -21,10 +20,10 @@
 }
 
 .progress__label {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.8rem;
-  color: var(--text-dim);
-  min-width: 34px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  min-width: 28px;
   text-align: right;
 }
