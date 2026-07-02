@@ -39,6 +39,20 @@ export function AuthProvider({ children }) {
     await supabase.auth.signOut()
   }
 
+  // Envía el email de restablecimiento; el enlace regresa a /restablecer
+  async function resetPassword(email) {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/restablecer`,
+    })
+    return error ?? null
+  }
+
+  // Define la nueva contraseña (requiere la sesión de recuperación del enlace)
+  async function updatePassword(password) {
+    const { error } = await supabase.auth.updateUser({ password })
+    return error ?? null
+  }
+
   return (
     <AuthContext.Provider value={{
       session,
@@ -47,6 +61,8 @@ export function AuthProvider({ children }) {
       signIn,
       signUp,
       signOut,
+      resetPassword,
+      updatePassword,
     }}>
       {children}
     </AuthContext.Provider>
