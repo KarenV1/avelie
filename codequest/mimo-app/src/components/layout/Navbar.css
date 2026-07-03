@@ -6,7 +6,9 @@
   right: 0;
   z-index: 50;
   background: rgba(10, 9, 0, 0.97);
-  backdrop-filter: blur(16px);
+  /* Sin backdrop-filter: con blur, iOS/Android repintan la barra con retraso
+     al hacer scroll y parece despegarse. translateZ la aísla en su capa. */
+  transform: translateZ(0);
   border-top: 1px solid var(--border-soft);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
