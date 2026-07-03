@@ -124,6 +124,9 @@ Nunca recrees estos estilos inline ni dupliques un botón/barra. Si falta una va
 ## 6. Byte (mascota) — usa el asset oficial
 
 - Renderiza SIEMPRE vía **ByteMascot**. NUNCA redibujes, simplifiques ni reinterpretes a Byte.
+- Assets oficiales en `public/`: **`byte.png`** (Byte completo, asset por defecto del componente)
+  y **`pixel-asomada.png`** (pose asomada, se pasa como `src` explícito).
+  `byte-full.png` es el asset anterior, conservado solo como respaldo; no usarlo en código nuevo.
 - Si falta una pose y no existe asset, **DETENTE y pregunta**; no improvises una ilustración.
 - Marca la posición actual en el mapa y puede asomarse desde un borde lateral (BytePeek)
   sin tapar el camino (`pointer-events:none`).
