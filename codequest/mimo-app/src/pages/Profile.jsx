@@ -1,9 +1,10 @@
 // src/pages/Profile.jsx
+import { Link } from 'react-router-dom'
 import { courses, unitItemIds } from '../data/courses/index.js'
 import { useProgress } from '../context/ProgressContext.jsx'
 import ProgressBar from '../components/common/ProgressBar.jsx'
 import ByteMascot from '../components/common/ByteMascot.jsx'
-import { IconFlame, IconStar, IconCheck, CourseIcon } from '../components/common/icons.jsx'
+import { IconFlame, IconStar, IconCheck, IconSettings, CourseIcon } from '../components/common/icons.jsx'
 import '../components/common/ByteMascot.css'
 import './Profile.css'
 
@@ -75,6 +76,10 @@ export default function Profile() {
           <h1 className="profile__name">Mi progreso</h1>
           <p className="muted">Nivel {level} · {progress.xp} XP totales</p>
         </div>
+        {/* Acceso a Ajustes (cuenta, cerrar sesión): el perfil es donde se busca */}
+        <Link to="/ajustes" className="profile__settings" aria-label="Ajustes">
+          <IconSettings style={{ width: 20, height: 20 }} />
+        </Link>
       </header>
 
       {/* Top stat chips */}

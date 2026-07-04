@@ -21,6 +21,22 @@
   padding: 18px 0 22px;
 }
 
+/* Engrane → /ajustes (cuenta, cerrar sesión); mismo lenguaje que cmap__page-settings */
+.profile__settings {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-left: auto;
+  align-self: flex-start;
+  color: var(--text-faint);
+  border-radius: var(--r-sm);
+  transition: color 0.15s ease;
+  flex-shrink: 0;
+}
+.profile__settings:hover { color: var(--text); }
+
 .profile__name {
   font-family: var(--font-pixel);
   font-size: 0.78rem;
