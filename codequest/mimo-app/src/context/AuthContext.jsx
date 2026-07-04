@@ -31,8 +31,15 @@ export function AuthProvider({ children }) {
   }
 
   async function signUp(email, password) {
-    const { error } = await supabase.auth.signUp({ email, password })
-    return error ?? null
+    const { data, error } = await supabase.auth.signUp({ email, password })
+    if (error) return error
+    // Anti-enumeración: con un email ya registrado Supabase responde "éxito"
+    // con identities vacío y NO envía ningún correo. Sin esta detección la UI
+    // mostraría "revisa tu correo" a alguien que ya tiene cuenta.
+    if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      return { message: 'User already registered' }
+    }
+    return null
   }
 
   async function signOut() {

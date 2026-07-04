@@ -13,7 +13,7 @@ function friendlyError(msg) {
   if (!msg) return 'Ocurrió un error inesperado.'
   if (msg.includes('Invalid login credentials')) return 'Email o contraseña incorrectos.'
   if (msg.includes('Email not confirmed'))       return 'Confirma tu email antes de entrar.'
-  if (msg.includes('User already registered'))   return 'Ya existe una cuenta con ese email.'
+  if (msg.includes('User already registered'))   return 'Ya existe una cuenta con ese email. Entra con tu contraseña o recupérala si la olvidaste.'
   if (msg.includes('Password should be'))        return 'La contraseña debe tener al menos 6 caracteres.'
   if (msg.includes('For security purposes'))     return 'Demasiados intentos seguidos. Espera un momento y vuelve a intentar.'
   if (msg.includes('Unable to validate'))        return 'Supabase no está configurado todavía.'
