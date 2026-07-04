@@ -5,6 +5,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import Button from '../components/common/Button.jsx'
 import ByteMascot from '../components/common/ByteMascot.jsx'
+import PasswordInput from '../components/common/PasswordInput.jsx'
 import '../components/common/ByteMascot.css'
 import './Login.css'
 
@@ -125,10 +126,9 @@ export default function Login() {
               <label className="faint login__label" htmlFor="login-password">
                 Contraseña
               </label>
-              <input
+              <PasswordInput
                 id="login-password"
                 className="login__input"
-                type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required

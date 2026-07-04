@@ -6,6 +6,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import Button from '../components/common/Button.jsx'
 import ByteMascot from '../components/common/ByteMascot.jsx'
+import PasswordInput from '../components/common/PasswordInput.jsx'
 import '../components/common/ByteMascot.css'
 import './Login.css'
 
@@ -94,10 +95,9 @@ export default function ResetPassword() {
             <label className="faint login__label" htmlFor="new-password">
               Nueva contraseña
             </label>
-            <input
+            <PasswordInput
               id="new-password"
               className="login__input"
-              type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
@@ -111,10 +111,9 @@ export default function ResetPassword() {
             <label className="faint login__label" htmlFor="confirm-password">
               Repite la contraseña
             </label>
-            <input
+            <PasswordInput
               id="confirm-password"
               className="login__input"
-              type="password"
               value={confirm}
               onChange={e => setConfirm(e.target.value)}
               required
