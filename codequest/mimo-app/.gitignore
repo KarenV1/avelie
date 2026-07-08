@@ -32,3 +32,6 @@ pnpm-debug.log*
 
 .vercel
 .env*
+
+# Previews locales de módulos sin publicar (generadas por Claude)
+previews/
