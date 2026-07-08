@@ -157,6 +157,10 @@ let loading = null
 
 export function loadRemoteCourses() {
   loading ??= (async () => {
+    // Desde la migración 007 el RLS deja leer la metadata de TODOS los
+    // cursos (para que el catálogo muestre los "próximamente"); filtrar
+    // los publicados es responsabilidad de cada query. Aquí solo queremos
+    // cursos con contenido jugable:
     const { data, error } = await supabase
       .from('courses')
       .select(
@@ -165,6 +169,7 @@ export function loadRemoteCourses() {
            lessons ( slug, title, kind, xp, sort_order,
              content_blocks ( sort_order, kind, payload ) ) )`,
       )
+      .eq('is_published', true)
 
     if (error) {
       console.warn('No se pudieron cargar cursos desde Supabase:', error.message)
