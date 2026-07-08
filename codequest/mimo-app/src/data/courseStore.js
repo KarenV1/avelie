@@ -23,6 +23,7 @@ function mapBlockToStep(block) {
     case 'texto':
       return { type: 'info', title: p.title, body: p.body }
     case 'ejemplo_sql':
+    case 'ejemplo_codigo': // mismo contrato; kind propio por semántica en la base
       return {
         type: 'example',
         title: p.title ?? null,
