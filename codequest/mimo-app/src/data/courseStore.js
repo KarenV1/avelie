@@ -50,6 +50,23 @@ function mapBlockToStep(block) {
       }
     case 'resumen':
       return { type: 'summary', title: p.title, points: p.points }
+    case 'laboratorio':
+      // Mismo contrato que ejemplo_sql: code = comandos de terminal
+      // (Windows y Linux), caption = qué observar, result opcional.
+      // Kind propio en la base para darle UI dedicada más adelante.
+      return {
+        type: 'example',
+        title: p.title ? `🧪 ${p.title}` : '🧪 Laboratorio',
+        code: p.code,
+        caption: p.caption ?? null,
+        result: p.result ?? null,
+      }
+    case 'nota_etica':
+      return {
+        type: 'info',
+        title: p.title ? `⚖️ ${p.title}` : '⚖️ Nota ética',
+        body: p.body,
+      }
     default:
       return null // 'ejercicio' se mapea a nivel de lesson (práctica)
   }
