@@ -1,0 +1,179 @@
+/* LearningPath — mapa de rutas del catálogo. Solo tokens (index.css).
+   Amarillo (--teal) únicamente en interacción, según DESIGN.md. */
+
+.lpath {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.lpath__label {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+}
+
+/* ── Ruta ── */
+.lpath__track {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg-soft);
+  padding: 14px;
+}
+
+.lpath__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.lpath__emoji { font-size: 1.2rem; line-height: 1.4; }
+
+.lpath__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.lpath__desc {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--text-dim);
+}
+
+.lpath__empty {
+  margin: 0;
+  padding: 12px;
+  border: 1px dashed var(--border-bright);
+  border-radius: var(--r-md);
+  font-size: 0.8rem;
+  color: var(--text-faint);
+  text-align: center;
+}
+
+/* ── Cadena de cursos ── */
+.lpath__chain {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.lpath__step { position: relative; }
+
+.lpath__step + .lpath__step { margin-top: 14px; }
+
+/* Conector vertical entre cursos consecutivos de la ruta */
+.lpath__step + .lpath__step::before {
+  content: '';
+  position: absolute;
+  left: 28px;
+  top: -14px;
+  height: 14px;
+  border-left: 2px dashed var(--border-bright);
+}
+
+.lpath__course {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  text-align: left;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.lpath__course:hover:not(:disabled) {
+  background: var(--surface-hover);
+  border-color: var(--border);
+}
+
+.lpath__course:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+.lpath__course:disabled { cursor: default; }
+
+.lpath__course--locked { opacity: 0.55; }
+
+.lpath__icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-md);
+  background: var(--bg-soft);
+}
+
+.lpath__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.lpath__course-title {
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.lpath__meta {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-faint);
+}
+
+.lpath__state {
+  flex-shrink: 0;
+  color: var(--text-faint);
+}
+
+.lpath__req {
+  margin: 4px 0 0 46px;
+  font-size: 0.72rem;
+  color: var(--text-faint);
+}
+
+/* ── Placeholder cuando el catálogo aún no carga ── */
+.lpath__placeholder {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px dashed var(--border-bright);
+  border-radius: var(--r-md);
+  background: none;
+  text-align: center;
+}
+
+.lpath__placeholder-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.lpath__placeholder-sub {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  color: var(--text-faint);
+}

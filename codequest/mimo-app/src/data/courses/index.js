@@ -1,22 +1,21 @@
 // src/data/courses/index.js
-// Registro central de cursos.
-// Para AGREGAR UN CURSO NUEVO (Java, Python, APIs REST, Testing, Oracle):
-//   1. Crea un archivo JSON en esta carpeta siguiendo el mismo modelo que sql-basico.json
-//   2. Impórtalo aquí y añádelo al array `courses`.
-// No hay que tocar ninguna pantalla: todas leen desde este registro.
+// Registro central de cursos — misma API de siempre (courses, getCourse,
+// getUnit, getItem, unitItemIds), pero ahora lee del courseStore:
+// JSON locales como fallback + contenido real desde Supabase en runtime.
+// Para AGREGAR UN CURSO NUEVO ya no se toca el frontend: se insertan sus
+// filas en Supabase (courses → modules → lessons → content_blocks) con un
+// seed como supabase/migrations/010_seed_sql_oracle_m01.sql.
+import { getCourses, subscribeCourses } from '../courseStore.js'
 
-import sqlBasico from './sql-basico.json'
-import sqlOracle from './sql-oracle.json'
-// import javaBasico from './java-basico.json'  // <-- Fase 2
-
-export const courses = [
-  sqlBasico,
-  sqlOracle,
-  // javaBasico,
-]
+// Binding vivo: se reasigna cuando llega contenido remoto. Las pantallas
+// re-renderizan vía el useSyncExternalStore de App.jsx y releen este valor.
+export let courses = getCourses()
+subscribeCourses(() => {
+  courses = getCourses()
+})
 
 export function getCourse(courseId) {
-  return courses.find((c) => c.id === courseId) || null
+  return getCourses().find((c) => c.id === courseId) || null
 }
 
 export function getUnit(courseId, unitId) {

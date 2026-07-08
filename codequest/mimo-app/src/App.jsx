@@ -1,8 +1,10 @@
 // src/App.jsx
 // El acceso a CodeQuest requiere sesión: sin ella solo existen
 // Bienvenida (umbral del mundo), Login y Restablecer contraseña.
+import { useEffect, useSyncExternalStore } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext.jsx'
+import { subscribeCourses, getCourses, loadRemoteCourses } from './data/courseStore.js'
 import Navbar from './components/layout/Navbar.jsx'
 import Home from './pages/Home.jsx'
 import Welcome from './pages/Welcome.jsx'
@@ -29,6 +31,12 @@ function AuthLoading() {
 
 export default function App() {
   const { user, loading } = useAuth()
+
+  // Contenido de cursos: re-render cuando llega la versión remota de Supabase
+  useSyncExternalStore(subscribeCourses, getCourses)
+  useEffect(() => {
+    loadRemoteCourses()
+  }, [])
 
   // Aún no sabemos si hay sesión — Byte espera contigo
   if (loading) return <AuthLoading />

@@ -5,6 +5,7 @@ import { courses, unitItemIds } from '../data/courses/index.js'
 import { useProgress } from '../context/ProgressContext.jsx'
 import ProgressBar from '../components/common/ProgressBar.jsx'
 import { CourseIcon } from '../components/common/icons.jsx'
+import LearningPath from '../components/catalog/LearningPath.jsx'
 import './Home.css'
 
 export default function Cursos() {
@@ -46,14 +47,10 @@ export default function Cursos() {
             <span className="course-card__pct">{pct}%</span>
           </button>
         ))}
-        <button className="course-card course-card--add">
-          <div className="course-card__icon">＋</div>
-          <div className="course-card__body">
-            <h3 className="course-card__title">Más cursos próximamente</h3>
-            <p className="course-card__sub">Java, Python, APIs REST…</p>
-          </div>
-        </button>
       </div>
+
+      {/* Catálogo con itinerario: rutas de aprendizaje desde Supabase */}
+      <LearningPath />
     </main>
   )
 }

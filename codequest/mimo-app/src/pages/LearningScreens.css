@@ -85,6 +85,40 @@
   line-height: 1.5;
 }
 
+/* Resultado esperado de un ejemplo SQL (tabla) */
+.learn-result { margin-top: 10px; }
+.learn-result__label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+.learn-result__scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.learn-result__table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+}
+.learn-result__table th,
+.learn-result__table td {
+  border: 1px solid var(--border);
+  padding: 5px 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+.learn-result__table th {
+  background: var(--surface-2);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.learn-result__table td { color: var(--text-dim); }
+.learn-result__table tr:nth-child(even) td { background: rgba(255, 255, 255, 0.015); }
+
 /* Progreso del paso */
 .learn__donenote {
   font-family: var(--font-mono);

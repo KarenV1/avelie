@@ -1,5 +1,29 @@
 import MiniQuestion from './MiniQuestion.jsx'
 import FeedbackBox from './FeedbackBox.jsx'
+import { getDiagram } from '../diagrams/registry.js'
+
+// Resultado esperado de un ejemplo SQL, mostrado como tabla
+function ResultTable({ result }) {
+  if (!result?.columns) return null
+  return (
+    <div className="learn-result">
+      <p className="learn-result__label faint">Resultado</p>
+      <div className="learn-result__scroll">
+        <table className="learn-result__table">
+          <thead>
+            <tr>{result.columns.map((c) => <th key={c}>{c}</th>)}</tr>
+          </thead>
+          <tbody>
+            {result.rows.map((row, ri) => (
+              <tr key={ri}>{row.map((cell, ci) => <td key={ci}>{cell}</td>)}</tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {result.note && <p className="learn__caption faint">{result.note}</p>}
+    </div>
+  )
+}
 
 const INTERACTIVE_TYPES = new Set([
   'multiple_choice', 'fill_blank', 'code_choice', 'debug', 'table_reading',
@@ -37,11 +61,28 @@ export default function StepRenderer({ step, selected, checked, onSelect }) {
             <p className="quiz__prompt" style={{ marginBottom: 10 }}>{step.title}</p>
           )}
           <pre className="code-block"><code>{step.code}</code></pre>
+          {step.result && <ResultTable result={step.result} />}
           {step.caption && (
             <p className="learn__caption faint">{step.caption}</p>
           )}
         </div>
       )
+
+    case 'diagram': {
+      const Diagram = getDiagram(step.component)
+      if (!Diagram) return null
+      return (
+        <div className="learn__example">
+          {step.title && (
+            <p className="quiz__prompt" style={{ marginBottom: 10 }}>{step.title}</p>
+          )}
+          <Diagram {...step.props} />
+          {step.caption && (
+            <p className="learn__caption faint" style={{ marginTop: 10 }}>{step.caption}</p>
+          )}
+        </div>
+      )
+    }
 
     case 'multiple_choice':
     case 'fill_blank':

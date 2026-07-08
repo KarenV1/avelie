@@ -1,0 +1,139 @@
+/* DiagramShell — marco y vocabulario visual compartido de los diagramas.
+   Solo tokens (index.css). Amarillo (--teal) únicamente en selección/foco. */
+
+.dg {
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg-soft);
+  overflow: hidden;
+}
+
+.dg__label {
+  padding: 10px 14px 0;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+}
+
+.dg__controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 14px 0;
+}
+
+.dg__scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 14px;
+}
+
+.dg__canvas svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.dg__info {
+  border-top: 1px solid var(--border-soft);
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-dim);
+  min-height: 40px;
+}
+
+.dg__info strong { color: var(--text); font-weight: 600; }
+.dg__hint { color: var(--text-faint); }
+
+/* ── Vocabulario SVG compartido ── */
+
+.dg-svg text {
+  font-family: var(--font-body);
+  fill: var(--text-dim);
+  user-select: none;
+}
+
+/* Entidad (caja) */
+.dg-entity rect,
+.dg-node rect {
+  fill: var(--surface);
+  stroke: var(--border-bright);
+  stroke-width: 1;
+  transition: stroke 160ms ease;
+}
+.dg-entity__name {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  fill: var(--text);
+}
+.dg-attr { font-family: var(--font-mono); font-size: 10.5px; fill: var(--text-dim); }
+.dg-attr--pk { fill: var(--text); font-weight: 600; }
+.dg-tag { font-family: var(--font-mono); font-size: 8.5px; fill: var(--text-faint); }
+
+/* Conector / línea de relación */
+.dg-line { stroke: var(--text-faint); stroke-width: 1.5; fill: none; }
+.dg-line--dashed { stroke-dasharray: 5 4; }
+.dg-end { stroke: var(--text-dim); stroke-width: 1.5; fill: none; }
+.dg-end circle { fill: var(--bg-soft); }
+.dg-verb { font-size: 10.5px; fill: var(--text-dim); font-style: italic; }
+
+/* Partes interactivas: hover sutil, selección en amarillo */
+.dg-hit { cursor: pointer; outline: none; }
+.dg-hit:hover rect, .dg-hit:hover circle { stroke: var(--text-dim); }
+.dg-hit:focus-visible rect, .dg-hit:focus-visible circle { stroke: var(--teal); }
+.dg-hit--selected rect,
+.dg-hit--selected circle { stroke: var(--teal) !important; }
+.dg-hit--selected .dg-entity__name { fill: var(--teal); }
+.dg-hit--selected.dg-end, .dg-hit--selected .dg-end { stroke: var(--teal); }
+.dg-hit--selected text.dg-verb { fill: var(--teal); }
+
+/* Chips de instancias (vista de ejemplo con datos reales) */
+.dg-chip rect { fill: var(--surface); stroke: var(--border); rx: 8; }
+.dg-chip text { font-family: var(--font-mono); font-size: 10px; fill: var(--text-dim); }
+.dg-chip-line { stroke: var(--border-bright); stroke-width: 1.2; fill: none; }
+
+/* Zona resaltada de un diagrama interactivo (parte seleccionada) */
+.dg-zone {
+  fill: var(--teal-dim);
+  fill-opacity: 0.35;
+  stroke: var(--teal);
+  stroke-width: 1.5;
+  pointer-events: none;
+}
+
+/* Mini-tabla dibujada en SVG (modelo relacional / documental) */
+.dg-cell { fill: none; stroke: var(--border); stroke-width: 0.8; }
+.dg-cell--head { fill: var(--surface-2); }
+.dg-mono { font-family: var(--font-mono); font-size: 9.5px; fill: var(--text-dim); }
+.dg-mono--head { fill: var(--text); font-weight: 600; font-size: 9px; letter-spacing: 0.06em; }
+.dg-note { font-size: 10px; fill: var(--text-faint); font-style: italic; }
+
+/* Primitivos genéricos (primitives.jsx) */
+.dg-node__sub { font-size: 9.5px; fill: var(--text-faint); }
+.dg-conn-hit { stroke: transparent; stroke-width: 16; fill: none; }
+.dg-container > rect {
+  fill: none;
+  stroke: var(--border-bright);
+  stroke-width: 1;
+  stroke-dasharray: 6 5;
+}
+.dg-container__label {
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  fill: var(--text-faint);
+}
+.dg-hit--selected .dg-container__label { fill: var(--teal); }
+
+@media (prefers-reduced-motion: reduce) {
+  .dg-entity rect, .dg-node rect { transition: none; }
+}
