@@ -1,0 +1,31 @@
+producto_id,nombre,categoria,stock,stock_minimo,precio_unitario,fecha_vencimiento
+P001,Paracetamol 500 mg,analgésico,320,100,1.50,2027-08-31
+P002,Ibuprofeno 400 mg,antiinflamatorio,210,80,2.10,2027-05-31
+P003,Amoxicilina 500 mg,antibiótico,95,120,4.80,2026-11-30
+P004,Omeprazol 20 mg,gastroprotector,180,60,3.20,2027-02-28
+P005,Losartán 50 mg,antihipertensivo,260,90,2.90,2027-09-30
+P006,Metformina 850 mg,antidiabético,340,100,2.40,2027-06-30
+P007,Aspirina 100 mg,antiagregante,400,150,1.20,2028-01-31
+P008,Azitromicina 500 mg,antibiótico,70,80,6.50,2026-09-30
+P009,Naproxeno 550 mg,antiinflamatorio,150,70,2.60,2027-03-31
+P010,Salbutamol inhalador,broncodilatador,45,40,12.00,2026-12-31
+P011,Loratadina 10 mg,antihistamínico,220,80,1.80,2027-07-31
+P012,Enalapril 10 mg,antihipertensivo,190,90,2.00,2027-04-30
+P013,Diclofenaco gel,antiinflamatorio,85,50,4.20,2026-10-31
+P014,Ranitidina 150 mg,gastroprotector,30,60,2.70,2026-08-31
+P015,Cefalexina 500 mg,antibiótico,110,90,5.10,2027-01-31
+P016,Insulina glargina,antidiabético,25,30,45.00,2026-09-15
+P017,Atorvastatina 20 mg,hipolipemiante,270,100,3.50,2027-10-31
+P018,Prednisona 5 mg,corticoide,140,60,2.20,2027-05-15
+P019,Tramadol 50 mg,analgésico,60,70,3.80,2026-11-15
+P020,Vitamina D3 2000 UI,vitamínico,310,80,5.60,2028-03-31
+P021,Complejo B,vitamínico,280,80,4.10,2028-02-28
+P022,Suero oral 500 ml,hidratación,175,100,1.90,2027-08-15
+P023,Gasas estériles 10x10,material de curación,520,200,0.80,2029-01-31
+P024,Vendas elásticas 10 cm,material de curación,230,100,1.60,2029-06-30
+P025,Alcohol etílico 70%,antiséptico,90,120,2.30,2027-12-31
+P026,Yodopovidona solución,antiséptico,130,60,3.00,2027-11-30
+P027,Guantes de nitrilo M,material de curación,48,150,0.25,2028-05-31
+P028,Jeringas 5 ml,material de curación,610,250,0.35,2029-04-30
+P029,Termómetro digital,equipo,22,15,8.90,
+P030,Oxímetro de pulso,equipo,18,10,22.50,

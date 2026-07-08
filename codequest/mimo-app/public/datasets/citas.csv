@@ -1,0 +1,51 @@
+cita_id,paciente_id,medico_id,especialidad,fecha,estado,costo
+501,1,9,Cardiología,2026-03-12,atendida,850
+502,1,9,Cardiología,2026-05-04,atendida,850
+503,2,10,Pediatría,2026-03-15,atendida,600
+504,3,9,Cardiología,2026-03-20,atendida,850
+505,1,9,Cardiología,2026-01-01,atendida,850
+506,8,12,Dermatología,2026-02-06,atendida,600
+507,15,10,Pediatría,2026-03-11,atendida,700
+508,22,13,Traumatología,2026-04-16,cancelada,900
+509,29,11,Medicina Interna,2026-05-21,atendida,750
+510,36,9,Cardiología,2026-06-26,no_asistio,950
+511,3,12,Dermatología,2026-07-03,atendida,550
+512,10,10,Pediatría,2026-01-08,atendida,650
+513,17,13,Traumatología,2026-02-13,atendida,1000
+514,24,11,Medicina Interna,2026-03-18,atendida,700
+515,31,9,Cardiología,2026-04-23,cancelada,900
+516,38,12,Dermatología,2026-05-28,atendida,650
+517,5,10,Pediatría,2026-06-05,atendida,600
+518,12,13,Traumatología,2026-07-10,atendida,950
+519,19,11,Medicina Interna,2026-01-15,atendida,
+520,26,9,Cardiología,2026-02-20,atendida,850
+521,33,12,Dermatología,2026-03-25,no_asistio,600
+522,40,10,Pediatría,2026-04-02,cancelada,700
+523,7,13,Traumatología,2026-05-07,atendida,900
+524,14,11,Medicina Interna,2026-06-12,atendida,750
+525,21,9,Cardiología,2026-07-17,atendida,950
+526,28,12,Dermatología,2026-01-22,atendida,550
+527,35,10,Pediatría,2026-02-27,atendida,650
+528,2,13,Traumatología,2026-03-04,atendida,1000
+529,9,11,Medicina Interna,2026-04-09,cancelada,700
+530,16,9,Cardiología,2026-05-14,atendida,900
+531,23,12,Dermatología,2026-06-19,atendida,650
+532,30,10,Pediatría,2026-07-24,no_asistio,600
+533,37,13,Traumatología,15/07/2026,atendida,950
+534,4,11,Medicina Interna,2026-02-06,atendida,800
+535,11,9,Cardiología,2026-03-11,atendida,850
+536,18,12,Dermatología,2026-04-16,cancelada,600
+537,25,10,Pediatría,2026-05-21,atendida,700
+538,32,13,Traumatología,2026-06-26,atendida,900
+539,39,11,Medicina Interna,2026-07-03,atendida,750
+540,6,9,Cardiología,2026-01-08,atendida,950
+541,13,12,Dermatología,2026-02-13,atendida,550
+542,20,10,Pediatría,2026-03-18,atendida,650
+543,27,13,Traumatología,2026-04-23,cancelada,1000
+544,34,11,Medicina Interna,2026-05-28,atendida,700
+545,1,9,Cardiología,2026-06-05,atendida,900
+546,8,12,Dermatología,2026-07-10,atendida,650
+547,15,10,Pediatría,2026-01-15,atendida,600
+548,22,13,Traumatología,2026-02-20,atendida,950
+549,29,11,Medicina Interna,2026-03-25,atendida,800
+550,36,9,Cardiología,2026-04-02,cancelada,850
