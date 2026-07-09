@@ -9,7 +9,7 @@ export default function ConsolePanel({ consoleState }) {
           <p className={'console__msg ' + (consoleState.ok ? 'console__msg--ok' : 'console__msg--bad')}>
             {consoleState.ok ? '✓ ' : '✕ '}{consoleState.message}
           </p>
-          {consoleState.ok && consoleState.columns && (
+          {consoleState.columns && (
             <table className="result-table">
               <thead>
                 <tr>{consoleState.columns.map((c) => <th key={c}>{c}</th>)}</tr>

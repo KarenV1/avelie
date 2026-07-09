@@ -1,7 +1,8 @@
 // src/pages/PracticeScreen.jsx
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { getCourse, getUnit } from '../data/courses/index.js'
+import { precargarPython, ejecutarPython } from '../lib/pyRunner.js'
 import { useProgress } from '../context/ProgressContext.jsx'
 import PracticeHeader from '../components/practice/PracticeHeader.jsx'
 import InstructionsPanel from '../components/practice/InstructionsPanel.jsx'
@@ -25,6 +26,48 @@ function runValidators(code, validators) {
   return validators.every((pattern) => new RegExp(pattern, 'i').test(norm))
 }
 
+// Compara la salida real con la esperada (string con \n o array de líneas),
+// ignorando espacios al final de línea y líneas vacías finales.
+function coincideSalida(salida, esperada) {
+  const limpiar = (lineas) => {
+    const l = lineas.map((x) => String(x).replace(/\s+$/, ''))
+    while (l.length && l[l.length - 1] === '') l.pop()
+    return l.join('\n')
+  }
+  const esperadaLineas = Array.isArray(esperada) ? esperada : String(esperada).split('\n')
+  return limpiar(salida) === limpiar(esperadaLineas)
+}
+
+// Estado de consola a partir de un resultado real de Python.
+function consolaPython(r, mensajeOk) {
+  if (r.cargaFallida) {
+    return {
+      ok: false,
+      message: 'No se pudo preparar el entorno Python (¿sin conexión?). Revisa tu red y vuelve a intentar.',
+    }
+  }
+  if (r.timeout) {
+    return {
+      ok: false,
+      message: 'Tu código no terminó en 10 segundos. ¿Un bucle infinito? Algo dentro del bucle debe acercarlo a su final.',
+    }
+  }
+  if (!r.ok) {
+    return {
+      ok: false,
+      message: r.traceback[r.traceback.length - 1] ?? 'Error de ejecución',
+      columns: ['CONSOLA'],
+      rows: [...r.salida, ...r.traceback].map((l) => [l]),
+    }
+  }
+  return {
+    ok: true,
+    message: mensajeOk,
+    columns: ['CONSOLA'],
+    rows: (r.salida.length ? r.salida : ['(el programa no imprimió nada — ¿faltó un print?)']).map((l) => [l]),
+  }
+}
+
 export default function PracticeScreen() {
   const { courseId, unitId, itemId } = useParams()
   const navigate = useNavigate()
@@ -40,6 +83,14 @@ export default function PracticeScreen() {
   const [console_, setConsole] = useState(null) // { ok, columns?, rows?, message }
   const [validated, setValidated] = useState(null) // null | true | false
   const [hintsShown, setHintsShown] = useState(0)
+  const [ejecutando, setEjecutando] = useState(false)
+
+  // Python real (Pyodide): precargar el motor mientras el alumno lee las
+  // instrucciones, para que la primera ejecución no espere la descarga.
+  const usaPython = course?.language === 'python'
+  useEffect(() => {
+    if (usaPython) precargarPython()
+  }, [usaPython])
 
   if (!practice || practice.type !== 'practice') {
     return (
@@ -52,9 +103,20 @@ export default function PracticeScreen() {
   const unitPath = `/curso/${courseId}/unidad/${unitId}`
   const coursePath = `/curso/${courseId}` // el camino continuo del curso
 
-  function handleRun() {
-    const ok = runValidators(code, practice.validators)
+  async function handleRun() {
     setTab('consola')
+
+    if (usaPython) {
+      if (ejecutando) return
+      setEjecutando(true)
+      setConsole({ ok: true, message: 'Ejecutando tu código…' })
+      const r = await ejecutarPython(code, practice.entradas)
+      setConsole(consolaPython(r, 'Ejecución terminada.'))
+      setEjecutando(false)
+      return
+    }
+
+    const ok = runValidators(code, practice.validators)
     if (ok) {
       setConsole({ ok: true, ...practice.mockOutput, message: 'Consulta ejecutada correctamente.' })
     } else {
@@ -66,7 +128,38 @@ export default function PracticeScreen() {
     }
   }
 
-  function handleValidate() {
+  async function handleValidate() {
+    // Python real: validación en dos fases — la salida del programa debe
+    // coincidir con la esperada Y el código debe usar las construcciones
+    // pedidas (validators regex). Ver auditoría Pyodide aprobada.
+    if (usaPython) {
+      if (ejecutando) return
+      setEjecutando(true)
+      const estructuraOk = runValidators(code, practice.validators ?? [])
+      const r = await ejecutarPython(code, practice.entradas)
+      const salidaOk = r.ok && (practice.salidaEsperada == null || coincideSalida(r.salida, practice.salidaEsperada))
+      const ok = r.ok && estructuraOk && salidaOk
+      setValidated(ok)
+      setTab('consola')
+      if (ok) {
+        completeItem(courseId, practice.id, practice.xp)
+        setConsole(consolaPython(r, practice.successMessage))
+      } else {
+        let estado = consolaPython(r, '')
+        if (r.ok && !salidaOk) {
+          estado = { ...estado, ok: false, message: 'El programa corre, pero su salida no es la esperada. Compárala con el enunciado.' }
+        } else if (r.ok && !estructuraOk) {
+          estado = { ...estado, ok: false, message: practice.failMessage }
+        }
+        setConsole(estado)
+        if (!r.cargaFallida && hintsShown < practice.hints.length) {
+          setHintsShown((n) => n + 1) // revela una pista al fallar
+        }
+      }
+      setEjecutando(false)
+      return
+    }
+
     const ok = runValidators(code, practice.validators)
     setValidated(ok)
     if (ok) {
