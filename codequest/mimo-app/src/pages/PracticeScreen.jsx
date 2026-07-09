@@ -110,7 +110,7 @@ export default function PracticeScreen() {
       if (ejecutando) return
       setEjecutando(true)
       setConsole({ ok: true, message: 'Ejecutando tu código…' })
-      const r = await ejecutarPython(code, practice.entradas)
+      const r = await ejecutarPython(code, practice.entradas, practice.archivos)
       setConsole(consolaPython(r, 'Ejecución terminada.'))
       setEjecutando(false)
       return
@@ -136,7 +136,7 @@ export default function PracticeScreen() {
       if (ejecutando) return
       setEjecutando(true)
       const estructuraOk = runValidators(code, practice.validators ?? [])
-      const r = await ejecutarPython(code, practice.entradas)
+      const r = await ejecutarPython(code, practice.entradas, practice.archivos)
       const salidaOk = r.ok && (practice.salidaEsperada == null || coincideSalida(r.salida, practice.salidaEsperada))
       const ok = r.ok && estructuraOk && salidaOk
       setValidated(ok)

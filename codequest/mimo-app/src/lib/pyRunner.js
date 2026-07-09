@@ -11,10 +11,23 @@
 //     worker se termina y se recrea; la app nunca se congela.
 //   · input() se alimenta desde una cola de entradas definida por el
 //     ejercicio (estilo check50) — sin diálogos.
+//   · archivos: los datasets del curso (public/datasets/) se descargan
+//     al sistema de archivos del intérprete ANTES de ejecutar, para que
+//     el alumno haga open("pacientes.csv") como Python estándar puro.
 const VERSION_PYODIDE = 'v314.0.2'
 const INDEX_URL = `https://cdn.jsdelivr.net/pyodide/${VERSION_PYODIDE}/full/`
 const TIMEOUT_EJECUCION_MS = 10000
 const TIMEOUT_CARGA_MS = 120000 // primera descarga en móvil lento
+
+// URL base de los datasets del curso: relativa al dominio de la app
+// (mismo origen), con respaldo absoluto para contextos sin location.
+const BASE_ARCHIVOS = (() => {
+  try {
+    return new URL('/datasets/', globalThis.location.origin).href
+  } catch {
+    return 'https://codequest-coral.vercel.app/datasets/'
+  }
+})()
 
 // El worker se crea desde un Blob para no tocar la config del bundler.
 // OJO: es un template literal — no usar ${} dentro salvo INDEX_URL.
@@ -22,6 +35,7 @@ const codigoWorker = `
 const INDEX_URL = '${INDEX_URL}'
 let listo = null
 let pyodideCargado = false
+const archivosCargados = new Set()
 
 async function asegurar() {
   listo ??= (async () => {
@@ -33,8 +47,20 @@ async function asegurar() {
   return listo
 }
 
+// Descarga los archivos del curso al sistema de archivos del intérprete
+// (una vez por sesión): el código del alumno los abre con open() normal.
+async function cargarArchivos(py, archivos, base) {
+  for (const nombre of archivos ?? []) {
+    if (archivosCargados.has(nombre)) continue
+    const respuesta = await fetch(base + nombre)
+    if (!respuesta.ok) throw new Error('No se pudo cargar el archivo del curso: ' + nombre)
+    py.FS.writeFile(nombre, new Uint8Array(await respuesta.arrayBuffer()))
+    archivosCargados.add(nombre)
+  }
+}
+
 self.onmessage = async (e) => {
-  const { id, tipo, codigo, entradas } = e.data
+  const { id, tipo, codigo, entradas, archivos, baseArchivos } = e.data
   const salida = []
   try {
     const py = await asegurar()
@@ -42,6 +68,7 @@ self.onmessage = async (e) => {
       self.postMessage({ id, ok: true, salida })
       return
     }
+    await cargarArchivos(py, archivos, baseArchivos)
     py.setStdout({ batched: (linea) => salida.push(linea) })
     py.setStderr({ batched: (linea) => salida.push(linea) })
     const cola = [...(entradas ?? [])]
@@ -126,15 +153,19 @@ export function precargarPython() {
   return precarga
 }
 
-// Ejecuta código del alumno. Devuelve:
+// Ejecuta código del alumno. `archivos` = datasets del curso que deben
+// existir en el sistema de archivos antes de correr. Devuelve:
 //   { ok, salida: [líneas], traceback?: [líneas], timeout?, cargaFallida? }
-export async function ejecutarPython(codigo, entradas) {
+export async function ejecutarPython(codigo, entradas, archivos) {
   const carga = await precargarPython()
   if (carga.timeout || carga.cargaFallida) {
     precarga = null // permitir reintento en la próxima ejecución
     return { ok: false, salida: [], cargaFallida: true }
   }
-  const r = await enviar({ tipo: 'run', codigo, entradas }, TIMEOUT_EJECUCION_MS)
+  const r = await enviar(
+    { tipo: 'run', codigo, entradas, archivos, baseArchivos: BASE_ARCHIVOS },
+    TIMEOUT_EJECUCION_MS,
+  )
   if (r.timeout) return { ok: false, salida: [], timeout: true }
   if (r.cargaFallida) return { ok: false, salida: [], cargaFallida: true }
   if (!r.ok) return { ok: false, salida: r.salida, traceback: limpiarTraceback(r.error) }
