@@ -1,17 +1,20 @@
 -- ═══════════════════════════════════════════════════════════════════
--- CodeQuest · Migración 010 — Módulo 1: Fundamentos del modelo de datos
+-- CodeQuest · Migración 012 — SQL con Oracle · Módulo 1 v2: Fundamentos
 -- ═══════════════════════════════════════════════════════════════════
--- ⚠️ SUPERSEDIDA POR LA 012 (M1 v2) — NO RE-EJECUTAR ESTA MIGRACIÓN.
--- Sus inserts de content_blocks filtran solo por l.slug (patrón previo
--- a los cursos múltiples): hoy 'm01-x01-examen' existe también en
--- Redes y Python, y re-ejecutarla inyectaría bloques de SQL en esos
--- exámenes. La 012 re-siembra este módulo con el patrón escopeado.
--- ═══════════════════════════════════════════════════════════════════
--- Contenido completo del módulo: 11 lecciones + examen de región.
--- Dataset del curso: hospital (PACIENTE, EXPEDIENTE, MEDICO,
--- ESPECIALIDAD, CITA, ESTUDIO_LAB).
+-- Extiende el M1 con el temario de Database Design aprobado (Tema 1):
+--   · NUEVA lección m01-l00-datos-vs-informacion (ord 1)
+--   · NUEVA lección m01-l01b-tres-niveles (conceptual/lógico/físico)
+--   · L02 enriquecida: tangible/intangible/evento, volátil vs no
+--     volátil, obligatorio (*) vs opcional (o), valor único, y el
+--     Diagrama 1.1 (cuadro editable de EMPLEADO) con NetworkDiagram
+--   · Examen: 13 → 16 preguntas (datos vs info, niveles, notación #*o)
+-- Las lecciones existentes CONSERVAN sus slugs: el progreso de los
+-- usuarios no se toca; las nuevas aparecen como pendientes.
+-- Reglas de contenido: sin tecnología interna de la plataforma;
+-- quizzes autocontenidos o con términos técnicos.
+-- OJO: SQL con Oracle está PUBLICADO — esta migración sale en vivo.
 -- Idempotente: borra y recrea las lecciones de ESTE módulo.
--- Ejecutar DESPUÉS de 002 y 003.
+-- Ejecutar DESPUÉS de 011 (estructura v2).
 -- ═══════════════════════════════════════════════════════════════════
 
 -- Limpia el módulo (cascade borra sus content_blocks)
@@ -29,27 +32,67 @@ select m.id, v.slug, v.title, v.kind, v.xp, v.ord
 from public.modules m
 join public.courses c on c.id = m.course_id,
      (values
-       ('m01-l01-modelo-de-datos',            '¿Qué es un modelo de datos?',            'leccion', 20, 1),
-       ('m01-l02-entidades-y-atributos',      'Entidades y atributos',                  'leccion', 20, 2),
-       ('m01-l03-relationship-vs-relation',   'Relación: relationship vs relation',     'leccion', 20, 3),
-       ('m01-l04-anatomia-de-la-tabla',       'La anatomía de una tabla',               'leccion', 20, 4),
-       ('m01-l05-modelo-er-y-notaciones',     'El modelo ER y sus notaciones',          'leccion', 20, 5),
-       ('m01-l06-cardinalidad-1-1',           'Cardinalidad 1:1',                       'leccion', 20, 6),
-       ('m01-l07-cardinalidad-1-n',           'Cardinalidad 1:N',                       'leccion', 20, 7),
-       ('m01-l08-cardinalidad-n-m',           'Cardinalidad N:M',                       'leccion', 20, 8),
-       ('m01-l09-participacion-y-opcionalidad','Participación y opcionalidad',          'leccion', 20, 9),
-       ('m01-l10-llaves-candidatas-y-pk',     'Llaves candidatas y primary key',        'leccion', 20, 10),
-       ('m01-l11-er-hospital',                'El modelo ER del hospital',              'leccion', 20, 11),
-       ('m01-x01-examen',                     'Examen: Fundamentos del modelo de datos','examen',  40, 12)
+       ('m01-l00-datos-vs-informacion',       'Datos vs información',                   'leccion', 20, 1),
+       ('m01-l01-modelo-de-datos',            '¿Qué es un modelo de datos?',            'leccion', 20, 2),
+       ('m01-l01b-tres-niveles',              'Los tres niveles del modelo',            'leccion', 20, 3),
+       ('m01-l02-entidades-y-atributos',      'Entidades y atributos',                  'leccion', 20, 4),
+       ('m01-l03-relationship-vs-relation',   'Relación: relationship vs relation',     'leccion', 20, 5),
+       ('m01-l04-anatomia-de-la-tabla',       'La anatomía de una tabla',               'leccion', 20, 6),
+       ('m01-l05-modelo-er-y-notaciones',     'El modelo ER y sus notaciones',          'leccion', 20, 7),
+       ('m01-l06-cardinalidad-1-1',           'Cardinalidad 1:1',                       'leccion', 20, 8),
+       ('m01-l07-cardinalidad-1-n',           'Cardinalidad 1:N',                       'leccion', 20, 9),
+       ('m01-l08-cardinalidad-n-m',           'Cardinalidad N:M',                       'leccion', 20, 10),
+       ('m01-l09-participacion-y-opcionalidad','Participación y opcionalidad',          'leccion', 20, 11),
+       ('m01-l10-llaves-candidatas-y-pk',     'Llaves candidatas y primary key',        'leccion', 20, 12),
+       ('m01-l11-er-hospital',                'El modelo ER del hospital',              'leccion', 20, 13),
+       ('m01-x01-examen',                     'Examen: Fundamentos del modelo de datos','examen',  40, 14)
      ) as v(slug, title, kind, xp, ord)
 where c.slug = 'sql-oracle' and m.slug = 'm01-modelo-de-datos';
+
+-- ═════════════════════════════════════════════════════════════════════
+-- L00 · Datos vs información (NUEVA — Tema 1)
+-- ═════════════════════════════════════════════════════════════════════
+insert into public.content_blocks (lesson_id, sort_order, kind, payload)
+select l.id, v.ord, v.kind, v.payload::jsonb
+from public.lessons l
+join public.modules m on m.id = l.module_id
+join public.courses c on c.id = m.course_id,
+(values
+  (1, 'texto', $j${"title":"Materia prima y producto terminado","body":"Antes de modelar nada, la distinción que sostiene toda la ingeniería de datos: DATOS e INFORMACIÓN no son sinónimos. Los DATOS son hechos en bruto, aislados y sin procesar: la cifra 850 en un registro de cobro, el nombre 'Ana Torres' en un archivo, la lectura cruda del sensor de una cámara. Solos, no dicen nada. La INFORMACIÓN es el conocimiento que se DERIVA de analizarlos y combinarlos: el ingreso promedio por especialidad, la tendencia de citas del trimestre, la puntuación media de una clase. En el hospital: cada cita guardada es un dato; 'Cardiología facturó 30% más que el trimestre pasado' es información — y es por lo que la dirección paga. Una base de datos almacena datos; su propósito es producir información."}$j$),
+  (2, 'texto', $j${"title":"El plano antes del edificio","body":"Si la información es el producto, el MODELADO DE DATOS es el plano arquitectónico de la fábrica: captura las necesidades del negocio ANTES de que se escriba una sola línea de SQL. ¿Qué cosas importan? ¿Cómo se relacionan? ¿Qué reglas las gobiernan? Un modelo bien pensado hace que las preguntas del negocio se respondan con consultas simples; uno mal pensado convierte cada pregunta en una excavación. Y hay una ley económica del oficio que conviene grabarse temprano: un error en el plano (fase de análisis) cuesta exponencialmente más corregirlo cuando el edificio está construido (producción). Por eso este curso dedica sus primeros cinco módulos al diseño — y solo entonces construye."}$j$),
+  (3, 'ejemplo_sql', $j${"title":"De datos a información en una consulta","code":"-- DATOS: los hechos en bruto, cita por cita\nSELECT especialidad, costo FROM cita;\n\n-- INFORMACIÓN: conocimiento derivado de combinarlos\nSELECT especialidad,\n       COUNT(*)          AS citas,\n       ROUND(AVG(costo)) AS costo_promedio\nFROM cita\nGROUP BY especialidad;","result":{"columns":["ESPECIALIDAD","CITAS","COSTO_PROMEDIO"],"rows":[["Cardiología","12","879"],["Pediatría","9","644"],["Traumatología","7","950"]],"note":"La segunda consulta no inventó nada: DERIVÓ conocimiento de los mismos hechos. Ese salto — de filas crudas a respuesta de negocio — es el oficio completo."},"caption":"SQL es la máquina que convierte datos en información. GROUP BY y AVG llegan a fondo en el módulo de agregación; aquí ilustran el destino del viaje."}$j$),
+  (4, 'quiz', $j${"variant":"multiple_choice","prompt":"En términos de ingeniería de datos, ¿cuál es la diferencia entre datos e información?","options":["Son sinónimos técnicos","Los DATOS son hechos en bruto sin procesar; la INFORMACIÓN es el conocimiento derivado de analizarlos y combinarlos","La información ocupa menos espacio","Los datos son digitales y la información impresa"],"correctIndex":1,"feedback":{"correct":"Correcto. La cifra de una venta es dato; la tendencia trimestral de ventas es información.","incorrect":"Datos = materia prima (hechos aislados); información = producto (conocimiento con significado, derivado del análisis)."}}$j$),
+  (5, 'quiz', $j${"variant":"multiple_choice","prompt":"Un hospital guarda cada cobro individual y la dirección recibe cada lunes el ingreso promedio por especialidad. Clasifica ambos:","options":["Los dos son datos","Los cobros individuales son DATOS; el promedio por especialidad es INFORMACIÓN derivada de ellos","Los dos son información","Los cobros son información y el promedio es dato"],"correctIndex":1,"feedback":{"correct":"Correcto. Hechos en bruto adentro, conocimiento accionable afuera: la base de datos existe para ese viaje.","incorrect":"Cada cobro es un hecho aislado (dato); el promedio es conocimiento derivado de combinarlos (información)."}}$j$),
+  (6, 'resumen', $j${"title":"Resumen — Datos vs información","points":["DATOS: hechos en bruto, aislados, sin procesar (la cifra 850, el nombre en un archivo).","INFORMACIÓN: conocimiento derivado de analizar y combinar datos (el promedio, la tendencia).","La base de datos almacena datos; su propósito es producir información.","El modelado es el plano arquitectónico: captura el negocio ANTES de escribir SQL.","Ley económica del oficio: el error en el plano cuesta exponencialmente más corregirlo en producción."]}$j$)
+) as v(ord, kind, payload)
+where c.slug = 'sql-oracle' and l.slug = 'm01-l00-datos-vs-informacion';
+
+-- ═════════════════════════════════════════════════════════════════════
+-- L01b · Los tres niveles del modelo (NUEVA — Tema 1)
+-- ═════════════════════════════════════════════════════════════════════
+insert into public.content_blocks (lesson_id, sort_order, kind, payload)
+select l.id, v.ord, v.kind, v.payload::jsonb
+from public.lessons l
+join public.modules m on m.id = l.module_id
+join public.courses c on c.id = m.course_id,
+(values
+  (1, 'texto', $j${"title":"Del negocio a Oracle, en tres planos","body":"Un modelo de datos no se dibuja de un solo trazo: se refina en TRES NIVELES, cada uno con su público y su pregunta. El MODELO CONCEPTUAL captura las necesidades funcionales y las reglas del negocio 'SIN IMPLANTACIÓN' — término del oficio que significa independiente de la tecnología: el mismo modelo vale dibujado en papel o cargado en cualquier software. Responde QUÉ es importante para el negocio. El MODELO LÓGICO lo formaliza: define entidades, atributos, identificadores únicos (UID) y relaciones, y se materializa en el Diagrama Entidad-Relación (ERD) que dominarás en este módulo. El MODELO FÍSICO es la extensión técnica: tablas, columnas, tipos de datos y restricciones específicas de un motor concreto — en nuestro caso, Oracle."}$j$),
+  (2, 'texto', $j${"title":"Por qué separar los niveles","body":"La separación no es burocracia: es lo que permite conversar con la gerente del hospital sobre PACIENTES y CITAS sin pronunciar jamás 'VARCHAR2' — y lo que permite cambiar de motor de base de datos sin rehacer el análisis del negocio, porque el conceptual y el lógico sobreviven intactos. Cada nivel valida al anterior: si una tabla del físico no responde a ninguna entidad del lógico, sobra; si una regla del conceptual no aterrizó en el lógico, falta. El viaje de traducción tiene nombres que iremos cumpliendo: entidad → tabla, atributo → columna, UID → clave primaria — el mapeo completo, con sus reglas de nomenclatura Oracle, tiene módulo propio más adelante ('Del modelo al esquema Oracle')."}$j$),
+  (3, 'quiz', $j${"variant":"multiple_choice","prompt":"¿Qué significa que el modelo conceptual sea 'sin implantación'?","options":["Que aún no está terminado","Que es INDEPENDIENTE de la tecnología: vale igual en papel que en cualquier software, porque captura el negocio y no el motor","Que no usa entidades","Que no puede modificarse"],"correctIndex":1,"feedback":{"correct":"Correcto. El conceptual habla del negocio; la tecnología llega recién en el nivel físico.","incorrect":"'Sin implantación' = independiente del almacenamiento físico: el conceptual captura QUÉ importa, no CÓMO se guarda."}}$j$),
+  (4, 'quiz', $j${"variant":"multiple_choice","prompt":"¿En cuál de los tres niveles del modelo aparecen por primera vez los tipos de datos como VARCHAR2 y NUMBER?","options":["Conceptual","Lógico","FÍSICO: es la extensión técnica para un motor concreto — tablas, columnas, tipos y restricciones de Oracle","En ninguno"],"correctIndex":2,"feedback":{"correct":"Correcto. Los tipos de datos son decisión de motor: territorio exclusivo del modelo físico.","incorrect":"VARCHAR2 y NUMBER son tecnología Oracle: viven en el modelo FÍSICO. El conceptual y el lógico no los mencionan."}}$j$),
+  (5, 'quiz', $j${"variant":"multiple_choice","prompt":"Ordena los tres niveles del modelo según el flujo de trabajo y lo que responde cada uno:","options":["Físico → lógico → conceptual","CONCEPTUAL (qué importa al negocio) → LÓGICO (entidades, atributos, UID, relaciones: el ERD) → FÍSICO (tablas y tipos del motor)","Lógico → conceptual → físico","El orden es indistinto"],"correctIndex":1,"feedback":{"correct":"Correcto. Del negocio a la formalización, y de ahí a la tecnología — cada nivel valida al anterior.","incorrect":"Se modela del negocio hacia la máquina: conceptual (qué) → lógico (ERD formal) → físico (Oracle)."}}$j$),
+  (6, 'resumen', $j${"title":"Resumen — Los tres niveles","points":["CONCEPTUAL: necesidades y reglas de negocio, 'sin implantación' (independiente de la tecnología). Responde QUÉ importa.","LÓGICO: entidades, atributos, UID y relaciones, formalizados en el ERD.","FÍSICO: tablas, columnas, tipos de datos y restricciones del motor (Oracle).","La separación permite hablar con el negocio sin tecnicismos y cambiar de motor sin rehacer el análisis.","El mapeo lógico → físico (entidad→tabla, UID→PK) tiene módulo propio: 'Del modelo al esquema Oracle'."]}$j$)
+) as v(ord, kind, payload)
+where c.slug = 'sql-oracle' and l.slug = 'm01-l01b-tres-niveles';
 
 -- ═════════════════════════════════════════════════════════════════════
 -- L01 · ¿Qué es un modelo de datos?
 -- ═════════════════════════════════════════════════════════════════════
 insert into public.content_blocks (lesson_id, sort_order, kind, payload)
 select l.id, v.ord, v.kind, v.payload::jsonb
-from public.lessons l,
+from public.lessons l
+join public.modules m on m.id = l.module_id
+join public.courses c on c.id = m.course_id,
 (values
   (1, 'texto', $j${"title":"El plano antes del edificio","body":"Un modelo de datos es la forma en que decides organizar, estructurar y relacionar la información antes de escribir una sola línea de código. Piensa en un hospital: pacientes, médicos, citas, estudios de laboratorio. ¿Cada cita guarda el nombre completo del paciente, o solo una referencia a él? ¿Qué pasa si la paciente cambia de teléfono? Un buen modelo responde estas preguntas UNA vez, y todo el sistema hereda esa claridad. Un mal modelo multiplica errores: datos duplicados, inconsistencias y consultas imposibles."}$j$),
   (2, 'texto', $j${"title":"Cuatro formas de organizar los mismos datos","body":"La historia de las bases de datos es la historia de cuatro modelos. El jerárquico (años 60, IBM IMS) organiza todo como un árbol. El de red (CODASYL, años 70) permite varios padres usando punteros. El relacional (E. F. Codd, 1970) organiza todo en tablas conectadas por llaves — es el modelo de Oracle. El documental (años 2010, MongoDB) guarda documentos JSON autocontenidos. En una entrevista es oro saber POR QUÉ ganó el relacional: consultas declarativas con SQL, independencia entre cómo se guardan los datos y cómo se consultan, e integridad garantizada por el motor."}$j$),
@@ -61,32 +104,40 @@ from public.lessons l,
   (8, 'quiz', $j${"variant":"multiple_choice","prompt":"Pregunta de entrevista: ¿cuál fue la ventaja decisiva del modelo relacional sobre el jerárquico y el de red?","options":["Usaba menos espacio en disco","Consultas declarativas (SQL) sin conocer la estructura física de almacenamiento","Era el único que corría en mainframes","No necesitaba administradores"],"correctIndex":1,"feedback":{"correct":"Exacto. Con SQL declaras QUÉ quieres, no CÓMO recorrer punteros o árboles. El motor decide el camino.","incorrect":"La clave fue la independencia: SQL declara qué datos quieres sin importar cómo se almacenan ni navegando punteros."}}$j$),
   (9, 'resumen', $j${"title":"Resumen — Modelo de datos","points":["Un modelo de datos define cómo se estructura y relaciona la información, antes que el código.","Cuatro modelos históricos: jerárquico (árbol), de red (punteros), relacional (tablas) y documental (JSON).","El jerárquico y el de red obligaban a duplicar datos o a navegar estructuras físicas.","El relacional (Codd, 1970) ganó por sus consultas declarativas y su independencia física.","Oracle Database es un motor relacional: será nuestro modelo el resto del curso."]}$j$)
 ) as v(ord, kind, payload)
-where l.slug = 'm01-l01-modelo-de-datos';
+where c.slug = 'sql-oracle' and l.slug = 'm01-l01-modelo-de-datos';
 
 -- ═════════════════════════════════════════════════════════════════════
 -- L02 · Entidades y atributos
 -- ═════════════════════════════════════════════════════════════════════
 insert into public.content_blocks (lesson_id, sort_order, kind, payload)
 select l.id, v.ord, v.kind, v.payload::jsonb
-from public.lessons l,
+from public.lessons l
+join public.modules m on m.id = l.module_id
+join public.courses c on c.id = m.course_id,
 (values
-  (1, 'texto', $j${"title":"Entidad: lo que existe y quieres registrar","body":"Una entidad es un objeto del mundo real, con existencia propia, del que necesitas guardar información. Son los sustantivos de tu dominio: en el hospital, PACIENTE, MEDICO, CITA, ESTUDIO_LAB. Distingue dos niveles: el TIPO de entidad (PACIENTE, la plantilla) y la INSTANCIA u ocurrencia (Ana Torres, un paciente concreto). Cuando diseñas un modelo trabajas con tipos; cuando la base de datos vive, se llena de instancias."}$j$),
+  (1, 'texto', $j${"title":"Entidad: lo que existe y quieres registrar","body":"Una entidad es un objeto del mundo real, con existencia propia, del que necesitas guardar información. Son los sustantivos de tu dominio: en el hospital, PACIENTE, MEDICO, CITA, ESTUDIO_LAB. Pueden ser TANGIBLES (PACIENTE, PRODUCTO — se tocan), INTANGIBLES (NIVEL DE HABILIDAD, una categoría) o EVENTOS (CITA, CONCIERTO — cosas que ocurren). Distingue dos niveles: el TIPO de entidad (PACIENTE, la plantilla) y la INSTANCIA u ocurrencia (Ana Torres, un paciente concreto). Cuando diseñas un modelo trabajas con tipos; cuando la base de datos vive, se llena de instancias."}$j$),
   (2, 'texto', $j${"title":"Atributos: lo que describes de cada entidad","body":"Un atributo es una propiedad que describe a la entidad: PACIENTE tiene nombre, dni, fecha_nacimiento, teléfono. Clasificaciones que aparecen en entrevistas: simple (dni) vs compuesto (dirección = calle + ciudad + código postal); monovaluado (fecha_nacimiento, una sola) vs multivaluado (teléfonos: puede tener varios — se resolverá con otra tabla); y almacenado vs DERIVADO. La edad es el ejemplo clásico de atributo derivado: nunca se guarda, se calcula desde fecha_nacimiento. Guardarla sería sembrar un dato que caduca cada cumpleaños."}$j$),
-  (3, 'ejemplo_sql', $j${"title":"Atributos almacenados y derivados en Oracle","code":"SELECT nombre,\n       fecha_nacimiento,\n       TRUNC(MONTHS_BETWEEN(SYSDATE, fecha_nacimiento) / 12) AS edad\nFROM paciente;","result":{"columns":["NOMBRE","FECHA_NACIMIENTO","EDAD"],"rows":[["Ana Torres","14/02/1991","35"],["Luis Vega","30/07/1978","47"],["Marta Solís","09/11/2002","23"]]},"caption":"fecha_nacimiento es un atributo almacenado; edad es derivado: Oracle lo calcula al vuelo con MONTHS_BETWEEN y SYSDATE (las verás a fondo en el módulo 5)."}$j$),
-  (4, 'quiz', $j${"variant":"multiple_choice","prompt":"En el modelo del hospital, ¿cuál de estos es un TIPO de entidad?","options":["fecha_nacimiento","MEDICO","el valor O+","la edad de Ana"],"correctIndex":1,"feedback":{"correct":"Correcto. MEDICO es una entidad; fecha_nacimiento es un atributo y O+ es un valor.","incorrect":"MEDICO es la entidad (un objeto con existencia propia). Lo demás son atributos o valores de atributos."}}$j$),
-  (5, 'quiz', $j${"variant":"multiple_choice","prompt":"¿Por qué la edad se modela como atributo derivado y no se guarda?","options":["Porque ocupa demasiado espacio","Porque quedaría desactualizada: cambia sola con el tiempo","Porque Oracle no permite guardar números pequeños","Porque es un dato sensible"],"correctIndex":1,"feedback":{"correct":"Exacto. Un dato que puedes calcular y que caduca solo (cada cumpleaños) se deriva, no se almacena.","incorrect":"El problema es la desactualización: la edad cambia sola. Se calcula desde fecha_nacimiento cuando se necesita."}}$j$),
-  (6, 'quiz', $j${"variant":"table_reading","table":"PACIENTE\n---------------------------------------\npaciente_id | nombre       | dni\n---------------------------------------\n1           | Ana Torres   | 44210987\n2           | Luis Vega    | 38765401\n3           | Marta Solís  | 51002344","prompt":"¿Cuántas INSTANCIAS de la entidad PACIENTE muestra esta tabla?","options":["Una","Tres","Nueve","Ninguna: son atributos"],"correctIndex":1,"feedback":{"correct":"Correcto. Cada fila es una instancia: Ana, Luis y Marta. Las columnas son los atributos.","incorrect":"Cada fila es una instancia de PACIENTE. Hay tres filas, por lo tanto tres instancias."}}$j$),
-  (7, 'quiz', $j${"variant":"multiple_choice","prompt":"Un paciente puede tener varios teléfonos de contacto. ¿Qué tipo de atributo es teléfono?","options":["Derivado","Compuesto","Multivaluado","Simple"],"correctIndex":2,"feedback":{"correct":"Correcto. Varios valores del mismo atributo = multivaluado. En el modelo relacional se resuelve con una tabla aparte.","incorrect":"Si un atributo puede tener VARIOS valores a la vez (varios teléfonos), es multivaluado."}}$j$),
-  (8, 'resumen', $j${"title":"Resumen — Entidades y atributos","points":["Entidad: objeto del mundo real que registras (PACIENTE, MEDICO, CITA).","Tipo de entidad = la plantilla; instancia = un caso concreto (Ana Torres).","Atributo: propiedad que describe a la entidad (nombre, dni, fecha_nacimiento).","Clasificaciones clave: simple/compuesto, monovaluado/multivaluado, almacenado/derivado.","La edad nunca se guarda: se deriva de fecha_nacimiento (en Oracle, con MONTHS_BETWEEN y SYSDATE)."]}$j$)
+  (3, 'texto', $j${"title":"Volátil o estable, obligatorio u opcional","body":"Tres clasificaciones más completan la anatomía del atributo — y las tres deciden diseños. VOLÁTIL vs NO VOLÁTIL: un atributo volátil cambia con frecuencia (la edad cambia sola cada año); uno no volátil es estable (la fecha de nacimiento no cambia jamás). Regla del oficio: SIEMPRE prioriza almacenar el no volátil y deriva el volátil — es la misma lección del atributo derivado, ahora con nombre técnico. OBLIGATORIO vs OPCIONAL: un atributo obligatorio (se marca con *) debe tener valor para que la instancia exista — un PACIENTE sin nombre no es registrable; uno opcional (se marca con o) puede quedar NULO — y NULO significa AUSENCIA de valor: no es cero, no es texto vacío, es 'no se sabe / no aplica'. Y la regla del VALOR ÚNICO: en el modelo, un atributo guarda UN solo valor por instancia en un momento dado — los 'varios teléfonos' del atributo multivaluado violan esta regla, y la normalización (módulo 3) los cobrará."}$j$),
+  (4, 'ejemplo_sql', $j${"title":"Atributos almacenados y derivados en Oracle","code":"SELECT nombre,\n       fecha_nacimiento,\n       TRUNC(MONTHS_BETWEEN(SYSDATE, fecha_nacimiento) / 12) AS edad\nFROM paciente;","result":{"columns":["NOMBRE","FECHA_NACIMIENTO","EDAD"],"rows":[["Ana Torres","14/02/1991","35"],["Luis Vega","30/07/1978","47"],["Marta Solís","09/11/2002","23"]]},"caption":"fecha_nacimiento es un atributo almacenado; edad es derivado: Oracle lo calcula al vuelo con MONTHS_BETWEEN y SYSDATE (las verás a fondo en el módulo 5)."}$j$),
+  (5, 'diagrama', $j${"title":"El cuadro editable: la entidad en el ERD","component":"NetworkDiagram","props":{"label":"Diagrama 1.1 · Entidad EMPLEADO — notación del cuadro editable","ancho":520,"alto":330,"grupos":[{"id":"emp","x":150,"y":18,"w":220,"h":294,"titulo":"EMPLEADO","descripcion":"El CUADRO EDITABLE: la convención gráfica para representar una entidad en un ERD. El nombre va en singular y mayúsculas; adentro, sus atributos con la notación de identidad y obligatoriedad."}],"nodos":[{"id":"uid","x":170,"y":52,"w":180,"h":40,"titulo":"# empleado_id","tag":"UID","descripcion":"La almohadilla (#) marca el IDENTIFICADOR ÚNICO (UID): el atributo que distingue inequívocamente a cada instancia. En el módulo 2 conocerás su taxonomía completa."},{"id":"nom","x":170,"y":104,"w":180,"h":40,"titulo":"* nombre","descripcion":"El asterisco (*) marca un atributo OBLIGATORIO: sin valor aquí, la instancia no puede existir."},{"id":"fec","x":170,"y":156,"w":180,"h":40,"titulo":"* fecha_contratacion","descripcion":"Obligatorio y NO VOLÁTIL: la fecha de contratación no cambia. La antigüedad (volátil) se derivará de ella."},{"id":"tel","x":170,"y":208,"w":180,"h":40,"titulo":"o telefono","descripcion":"La o marca un atributo OPCIONAL: puede quedar NULO (ausencia de valor — ni cero ni texto vacío)."},{"id":"com","x":170,"y":260,"w":180,"h":40,"titulo":"o comision","descripcion":"Opcional con regla de negocio: solo el personal de ventas la tiene. Para el resto, NULO es la respuesta honesta."}],"enlaces":[],"hint":"Toca el marco de la entidad y cada atributo para leer su notación."},"caption":"La notación del oficio: # identifica (UID), * obliga, o permite el nulo. Con este cuadro se leen y dibujan todos los ERD del curso."}$j$),
+  (6, 'quiz', $j${"variant":"multiple_choice","prompt":"En el modelo del hospital, ¿cuál de estos es un TIPO de entidad?","options":["fecha_nacimiento","MEDICO","el valor O+","la edad de Ana"],"correctIndex":1,"feedback":{"correct":"Correcto. MEDICO es una entidad; fecha_nacimiento es un atributo y O+ es un valor.","incorrect":"MEDICO es la entidad (un objeto con existencia propia). Lo demás son atributos o valores de atributos."}}$j$),
+  (7, 'quiz', $j${"variant":"multiple_choice","prompt":"¿Por qué la edad se modela como atributo derivado y no se guarda?","options":["Porque ocupa demasiado espacio","Porque quedaría desactualizada: cambia sola con el tiempo","Porque Oracle no permite guardar números pequeños","Porque es un dato sensible"],"correctIndex":1,"feedback":{"correct":"Exacto. Un dato que puedes calcular y que caduca solo (cada cumpleaños) se deriva, no se almacena.","incorrect":"El problema es la desactualización: la edad cambia sola. Se calcula desde fecha_nacimiento cuando se necesita."}}$j$),
+  (8, 'quiz', $j${"variant":"table_reading","table":"PACIENTE\n---------------------------------------\npaciente_id | nombre       | dni\n---------------------------------------\n1           | Ana Torres   | 44210987\n2           | Luis Vega    | 38765401\n3           | Marta Solís  | 51002344","prompt":"¿Cuántas INSTANCIAS de la entidad PACIENTE muestra esta tabla?","options":["Una","Tres","Nueve","Ninguna: son atributos"],"correctIndex":1,"feedback":{"correct":"Correcto. Cada fila es una instancia: Ana, Luis y Marta. Las columnas son los atributos.","incorrect":"Cada fila es una instancia de PACIENTE. Hay tres filas, por lo tanto tres instancias."}}$j$),
+  (9, 'quiz', $j${"variant":"multiple_choice","prompt":"Un paciente puede tener varios teléfonos de contacto. ¿Qué tipo de atributo es teléfono?","options":["Derivado","Compuesto","Multivaluado","Simple"],"correctIndex":2,"feedback":{"correct":"Correcto. Varios valores del mismo atributo = multivaluado. En el modelo relacional se resuelve con una tabla aparte.","incorrect":"Si un atributo puede tener VARIOS valores a la vez (varios teléfonos), es multivaluado."}}$j$),
+  (10, 'quiz', $j${"variant":"multiple_choice","prompt":"En términos de volatilidad: entre guardar la EDAD o la FECHA DE NACIMIENTO de un paciente, el diseño correcto es…","options":["Guardar la edad, que es lo que se pregunta","Guardar la FECHA DE NACIMIENTO (no volátil, estable) y DERIVAR la edad (volátil) cuando se necesite","Guardar ambas por seguridad","Guardar la edad y actualizarla cada año a mano"],"correctIndex":1,"feedback":{"correct":"Correcto. La regla del oficio: prioriza el atributo no volátil y deriva el volátil.","incorrect":"La edad es VOLÁTIL (cambia sola); la fecha de nacimiento es estable. Se almacena lo estable y se deriva lo volátil."}}$j$),
+  (11, 'quiz', $j${"variant":"multiple_choice","prompt":"En la notación del cuadro editable de un ERD, los símbolos #, * y o significan, respectivamente:","options":["Comentario, importante y opcional","UID (identificador único), atributo OBLIGATORIO y atributo OPCIONAL (acepta nulo)","Número, texto y booleano","Índice, clave ajena y vista"],"correctIndex":1,"feedback":{"correct":"Correcto. # identifica, * obliga, o permite el nulo: el alfabeto del ERD.","incorrect":"La notación del oficio: # marca el UID, * los obligatorios y o los opcionales (pueden quedar nulos)."}}$j$),
+  (12, 'resumen', $j${"title":"Resumen — Entidades y atributos","points":["Entidad: objeto del mundo real que registras — tangible (PACIENTE), intangible (NIVEL DE HABILIDAD) o evento (CITA).","Tipo de entidad = la plantilla; instancia = un caso concreto (Ana Torres).","Clasificaciones: simple/compuesto, monovaluado/multivaluado, almacenado/derivado — y volátil/NO volátil: almacena lo estable, deriva lo volátil.","Obligatorio (*) exige valor; opcional (o) acepta NULO — la ausencia de valor, que no es cero ni texto vacío.","Notación del cuadro editable: # UID · * obligatorio · o opcional.","Valor único: un atributo, UN valor por instancia — los multivaluados los cobra la normalización (módulo 3)."]}$j$)
 ) as v(ord, kind, payload)
-where l.slug = 'm01-l02-entidades-y-atributos';
+where c.slug = 'sql-oracle' and l.slug = 'm01-l02-entidades-y-atributos';
 
 -- ═════════════════════════════════════════════════════════════════════
 -- L03 · Relación: relationship vs relation
 -- ═════════════════════════════════════════════════════════════════════
 insert into public.content_blocks (lesson_id, sort_order, kind, payload)
 select l.id, v.ord, v.kind, v.payload::jsonb
-from public.lessons l,
+from public.lessons l
+join public.modules m on m.id = l.module_id
+join public.courses c on c.id = m.course_id,
 (values
   (1, 'texto', $j${"title":"Las entidades no viven solas","body":"Un modelo con entidades sueltas no dice nada. El valor está en las asociaciones: un PACIENTE agenda una CITA, un MEDICO atiende una CITA, una CITA genera un ESTUDIO_LAB. En el modelo entidad-relación, estas asociaciones se llaman relationships y se nombran con un VERBO. Cuando leas o presentes un modelo, léelo como frases: cada médico ATIENDE cero o muchas citas."}$j$),
   (2, 'texto', $j${"title":"La trampa de la palabra relación","body":"Aquí cae medio mundo en las entrevistas. En inglés existen DOS términos que en español se traducen igual: RELATIONSHIP es la asociación entre entidades del modelo ER (paciente agenda cita). RELATION es un término formal del modelo relacional y significa... ¡TABLA! Por eso las bases de datos se llaman relacionales: por estar hechas de relations (tablas), NO por tener relaciones entre tablas. Si en una entrevista te preguntan qué es una relación en el modelo relacional, la respuesta es: una tabla."}$j$),
@@ -97,14 +148,16 @@ from public.lessons l,
   (7, 'quiz', $j${"variant":"multiple_choice","prompt":"Pregunta de entrevista: ¿por qué las bases de datos relacionales se llaman así?","options":["Porque tienen relaciones (foreign keys) entre tablas","Porque relation es el término formal de Codd para tabla","Porque relacionan aplicaciones entre sí","Por el nombre de la empresa que las inventó"],"correctIndex":1,"feedback":{"correct":"Exacto. Vienen de relation = tabla en el álgebra relacional de Codd. Las FKs son consecuencia, no origen del nombre.","incorrect":"El nombre viene de relation (tabla) en la teoría de Codd, no de las asociaciones entre tablas."}}$j$),
   (8, 'resumen', $j${"title":"Resumen — Relaciones","points":["Relationship: asociación entre entidades, nombrada con un verbo (PACIENTE agenda CITA).","Relation: término formal para TABLA en el modelo relacional. No las confundas.","Base de datos relacional viene de relation = tabla (Codd), no de tener FKs.","Grados: binaria (dos entidades), recursiva (consigo misma), ternaria (tres).","En los datos, un relationship se materializa como columnas que referencian a otra tabla."]}$j$)
 ) as v(ord, kind, payload)
-where l.slug = 'm01-l03-relationship-vs-relation';
+where c.slug = 'sql-oracle' and l.slug = 'm01-l03-relationship-vs-relation';
 
 -- ═════════════════════════════════════════════════════════════════════
 -- L04 · La anatomía de una tabla
 -- ═════════════════════════════════════════════════════════════════════
 insert into public.content_blocks (lesson_id, sort_order, kind, payload)
 select l.id, v.ord, v.kind, v.payload::jsonb
-from public.lessons l,
+from public.lessons l
+join public.modules m on m.id = l.module_id
+join public.courses c on c.id = m.course_id,
 (values
   (1, 'texto', $j${"title":"Dos vocabularios, una misma cosa","body":"El modelo relacional tiene un vocabulario formal (el de Codd, el de los libros y el de las entrevistas) y uno práctico (el del día a día con Oracle). Son la MISMA cosa con dos nombres: relación = tabla, tupla = fila, atributo = columna. A ellos se suman tres medidas: el dominio (qué valores puede tomar un atributo), el grado (cuántos atributos tiene la relación) y la cardinalidad (cuántas tuplas tiene). Quien maneja ambos vocabularios entiende cualquier libro, cualquier documentación y a cualquier entrevistador. Vamos a diseccionar una tabla real del hospital para fijarlos de una vez."}$j$),
   (2, 'diagrama', $j${"title":"Anatomía de la tabla PACIENTE","component":"TableAnatomyDiagram","props":{"nombre":"PACIENTE","columnas":[{"nombre":"paciente_id","pk":true,"dominio":"enteros positivos y únicos: 1, 2, 3, …"},{"nombre":"nombre","dominio":"texto de hasta 100 caracteres."},{"nombre":"grupo_sanguineo","dominio":"exactamente 8 valores posibles: O-, O+, A-, A+, B-, B+, AB- y AB+."},{"nombre":"fecha_nacimiento","dominio":"fechas válidas, nunca futuras."}],"filas":[["1","Ana Torres","O+","14/02/1991"],["2","Luis Vega","A-","03/09/1988"],["3","Marta Solís","B+","27/06/1995"]],"destacarDominio":"grupo_sanguineo","tuplaEjemplo":0},"caption":"Toca cada término (o cada zona de la tabla) y lee su definición formal y su equivalente práctico. Todos caen en entrevistas."}$j$),
@@ -116,14 +169,16 @@ from public.lessons l,
   (8, 'quiz', $j${"variant":"multiple_choice","prompt":"Pregunta de entrevista: te preguntan por 'la cardinalidad'. ¿Qué conviene distinguir antes de responder?","options":["Si se refieren a filas o a columnas","Si hablan de la cardinalidad de una tabla (nº de tuplas) o de la cardinalidad de una relación ER (1:1, 1:N, N:M)","Si hablan de Oracle o de otro motor","Nada: cardinalidad siempre significa lo mismo"],"correctIndex":1,"feedback":{"correct":"Exacto. Misma palabra, dos conceptos. Hacer esa distinción en voz alta demuestra dominio del tema.","incorrect":"La palabra tiene doble uso: nº de tuplas de una tabla vs tipo de relación ER (1:1, 1:N, N:M). Distinguirlo es la respuesta senior."}}$j$),
   (9, 'resumen', $j${"title":"Resumen — Anatomía de una tabla","points":["Relación = tabla; tupla = fila; atributo = columna. Dos vocabularios, una misma cosa.","El dominio es el conjunto de valores VÁLIDOS de un atributo (grupo_sanguineo: solo 8 valores).","El grado es el número de atributos; es estructura, no cambia con los datos.","La cardinalidad de una tabla es su número de tuplas; cambia con cada INSERT o DELETE.","Ojo de entrevista: cardinalidad de tabla (nº de tuplas) ≠ cardinalidad ER (1:1, 1:N, N:M).","La primary key identifica cada tupla: única y nunca NULL."]}$j$)
 ) as v(ord, kind, payload)
-where l.slug = 'm01-l04-anatomia-de-la-tabla';
+where c.slug = 'sql-oracle' and l.slug = 'm01-l04-anatomia-de-la-tabla';
 
 -- ═════════════════════════════════════════════════════════════════════
 -- L05 · El modelo ER y sus notaciones
 -- ═════════════════════════════════════════════════════════════════════
 insert into public.content_blocks (lesson_id, sort_order, kind, payload)
 select l.id, v.ord, v.kind, v.payload::jsonb
-from public.lessons l,
+from public.lessons l
+join public.modules m on m.id = l.module_id
+join public.courses c on c.id = m.course_id,
 (values
   (1, 'texto', $j${"title":"Un idioma para diseñar antes de construir","body":"El modelo entidad-relación (ER) lo propuso Peter Chen en 1976 y sigue siendo EL lenguaje para diseñar bases de datos. Un diagrama ER dibuja las entidades, sus atributos y las relaciones entre ellas, ANTES de crear una sola tabla. Es el plano que se discute con el equipo (¿un paciente puede tener varias citas el mismo día?) cuando cambiar algo todavía cuesta cero. En proyectos reales, el diagrama ER es lo primero que te muestran al llegar y lo primero que te piden dibujar en una entrevista de diseño."}$j$),
   (2, 'texto', $j${"title":"Tres notaciones que debes reconocer","body":"El mismo modelo puede dibujarse con distintas notaciones. Chen: la original académica — entidades en rectángulos, relaciones en rombos, atributos en óvalos. Pata de gallo (crow's foot / IE): la más usada en herramientas modernas; la cardinalidad se dibuja en los extremos de la línea con barras, anillos y las famosas tres puntas. Barker: la notación de Oracle (Oracle Designer y Oracle SQL Developer Data Modeler); usa pata de gallo para el lado muchos, y marca lo OPCIONAL con línea discontinua. En una entrevista pueden mostrarte cualquiera: entrena el ojo con las dos que usarás de verdad."}$j$),
@@ -134,14 +189,16 @@ from public.lessons l,
   (7, 'quiz', $j${"variant":"multiple_choice","prompt":"En notación Barker, ¿cómo se indica que la participación es opcional?","options":["Con un rombo","Con un asterisco","Con la mitad de la línea discontinua","Escribiendo la palabra opcional"],"correctIndex":2,"feedback":{"correct":"Correcto. En Barker, la mitad discontinua de la línea marca el extremo opcional de la relación.","incorrect":"Barker marca lo opcional con trazo discontinuo en la mitad correspondiente de la línea."}}$j$),
   (8, 'resumen', $j${"title":"Resumen — Modelo ER y notaciones","points":["El diagrama ER (Chen, 1976) diseña entidades, atributos y relaciones antes de crear tablas.","Notación Chen: rectángulos, rombos y óvalos — la académica.","Notación pata de gallo (IE): la más común en herramientas; tres puntas = muchos.","Notación Barker: la de Oracle; línea discontinua = participación opcional.","El mismo modelo puede dibujarse en cualquier notación: entrena el ojo para leer ambas."]}$j$)
 ) as v(ord, kind, payload)
-where l.slug = 'm01-l05-modelo-er-y-notaciones';
+where c.slug = 'sql-oracle' and l.slug = 'm01-l05-modelo-er-y-notaciones';
 
 -- ═════════════════════════════════════════════════════════════════════
 -- L06 · Cardinalidad 1:1
 -- ═════════════════════════════════════════════════════════════════════
 insert into public.content_blocks (lesson_id, sort_order, kind, payload)
 select l.id, v.ord, v.kind, v.payload::jsonb
-from public.lessons l,
+from public.lessons l
+join public.modules m on m.id = l.module_id
+join public.courses c on c.id = m.course_id,
 (values
   (1, 'texto', $j${"title":"Cardinalidad: cuántos con cuántos","body":"La cardinalidad de una relación responde una pregunta: ¿cuántas instancias de una entidad pueden asociarse con UNA instancia de la otra? Solo hay tres respuestas posibles y definen los tres tipos: 1:1 (uno a uno), 1:N (uno a muchos) y N:M (muchos a muchos). Elegir bien la cardinalidad es LA decisión de modelado: determina dónde van las llaves foráneas y cuántas tablas necesitas. En esta lección y las dos siguientes verás cada tipo con su diagrama y sus datos."}$j$),
   (2, 'texto', $j${"title":"1:1 — uno con uno","body":"En una relación 1:1, cada instancia de A se asocia con MÁXIMO una de B, y viceversa. Hospital: cada PACIENTE posee un único EXPEDIENTE clínico, y cada expediente pertenece a un único paciente. ¿Y por qué no fusionar las dos entidades en una? Razones reales para mantener 1:1 separado: el expediente tiene datos sensibles con permisos distintos (diagnósticos, alergias), puede no existir aún (paciente recién registrado), o son decenas de columnas que rara vez se consultan juntas. Anticipo técnico: en SQL, el 1:1 se implementa con una foreign key marcada UNIQUE."}$j$),
@@ -152,14 +209,16 @@ from public.lessons l,
   (7, 'quiz', $j${"variant":"multiple_choice","prompt":"¿Cuál es una buena razón para mantener PACIENTE y EXPEDIENTE como entidades 1:1 separadas en vez de una sola tabla?","options":["Las tablas pequeñas siempre son mejores","El expediente tiene datos sensibles con permisos de acceso distintos","Oracle no permite tablas de más de 20 columnas","Para poder borrar pacientes más rápido"],"correctIndex":1,"feedback":{"correct":"Correcto. Separar permite dar permisos distintos, manejar su ausencia y aislar columnas poco consultadas.","incorrect":"La razón real es de diseño: datos sensibles con otros permisos, existencia opcional o columnas rara vez consultadas."}}$j$),
   (8, 'resumen', $j${"title":"Resumen — Cardinalidad 1:1","points":["La cardinalidad dice cuántas instancias de una entidad se asocian con UNA de la otra.","1:1: cada instancia de A con máximo una de B, y viceversa (PACIENTE–EXPEDIENTE).","Razones para separar en 1:1: permisos distintos, existencia opcional, columnas poco usadas.","Se implementa con una foreign key + UNIQUE.","En los datos se reconoce porque la columna de referencia no repite valores."]}$j$)
 ) as v(ord, kind, payload)
-where l.slug = 'm01-l06-cardinalidad-1-1';
+where c.slug = 'sql-oracle' and l.slug = 'm01-l06-cardinalidad-1-1';
 
 -- ═════════════════════════════════════════════════════════════════════
 -- L07 · Cardinalidad 1:N
 -- ═════════════════════════════════════════════════════════════════════
 insert into public.content_blocks (lesson_id, sort_order, kind, payload)
 select l.id, v.ord, v.kind, v.payload::jsonb
-from public.lessons l,
+from public.lessons l
+join public.modules m on m.id = l.module_id
+join public.courses c on c.id = m.course_id,
 (values
   (1, 'texto', $j${"title":"1:N — la reina de las cardinalidades","body":"En una relación 1:N (uno a muchos), una instancia de A puede asociarse con MUCHAS de B, pero cada B pertenece a UNA sola A. Es, por mucho, la más común en cualquier base de datos real. En el hospital están por todas partes: un MEDICO atiende muchas CITAS (y cada cita tiene un solo médico), una ESPECIALIDAD agrupa muchos MEDICOS, una CITA genera muchos ESTUDIOS de laboratorio. Piensa en padre e hijos: el lado 1 es el padre, el lado N son los hijos."}$j$),
   (2, 'texto', $j${"title":"La regla de oro: la FK vive en el lado N","body":"Cuando el 1:N se convierte en tablas, la llave foránea SIEMPRE va en la tabla del lado muchos. ¿Por qué? Cada cita tiene UN médico: una columna medico_id en CITA basta y sobra. Al revés sería imposible: ¿cuántas columnas cita_id tendría que tener MEDICO para sus muchas citas? Esta regla — la FK vive en el hijo — resuelve la mitad de las preguntas de modelado de una entrevista técnica."}$j$),
@@ -170,14 +229,16 @@ from public.lessons l,
   (7, 'quiz', $j${"variant":"table_reading","table":"CITA\n----------------------------------\ncita_id | medico_id | fecha\n----------------------------------\n501     | 9         | 12/03\n502     | 9         | 04/05\n503     | 10        | 15/03\n504     | 9         | 20/03","prompt":"Según la tabla, ¿cuántas citas atiende el médico con id 9?","options":["Una","Dos","Tres","Cuatro"],"correctIndex":2,"feedback":{"correct":"Correcto. El 9 aparece en las citas 501, 502 y 504: tres citas. Así se ve el lado N.","incorrect":"Cuenta las filas donde medico_id = 9: son 501, 502 y 504. Tres citas."}}$j$),
   (8, 'resumen', $j${"title":"Resumen — Cardinalidad 1:N","points":["1:N: una instancia de A con muchas de B; cada B con exactamente una A.","Es la cardinalidad más común: MEDICO–CITA, ESPECIALIDAD–MEDICO, CITA–ESTUDIO_LAB.","Regla de oro: la foreign key SIEMPRE vive en la tabla del lado N (el hijo).","En los datos, el lado N se reconoce por la FK repetida (medico_id 9, tres veces).","El lado N puede ser cero: un médico recién contratado aún no tiene citas."]}$j$)
 ) as v(ord, kind, payload)
-where l.slug = 'm01-l07-cardinalidad-1-n';
+where c.slug = 'sql-oracle' and l.slug = 'm01-l07-cardinalidad-1-n';
 
 -- ═════════════════════════════════════════════════════════════════════
 -- L08 · Cardinalidad N:M
 -- ═════════════════════════════════════════════════════════════════════
 insert into public.content_blocks (lesson_id, sort_order, kind, payload)
 select l.id, v.ord, v.kind, v.payload::jsonb
-from public.lessons l,
+from public.lessons l
+join public.modules m on m.id = l.module_id
+join public.courses c on c.id = m.course_id,
 (values
   (1, 'texto', $j${"title":"N:M — muchos con muchos","body":"En una relación N:M, cada instancia de A puede asociarse con muchas de B, Y cada B con muchas de A. Hospital: un PACIENTE es atendido por varios MEDICOS a lo largo de su historia (cardióloga, pediatra...), y cada médico atiende a muchos pacientes. Aquí aparece un problema técnico que no existía en 1:1 ni 1:N: la relación N:M NO puede implementarse con una foreign key directa. ¿En qué tabla la pondrías? Cualquiera de los dos lados necesitaría guardar muchos valores en una columna — y eso está prohibido en el modelo relacional."}$j$),
   (2, 'diagrama', $j${"title":"PACIENTE N:M MÉDICO — el modelo conceptual","component":"CardinalityDiagram","props":{"tipo":"N:M","verbo":"es atendido por","izquierda":{"nombre":"PACIENTE","card":"N","min":0,"descripcion":"Un médico atiende a cero, uno o muchos pacientes."},"derecha":{"nombre":"MÉDICO","card":"N","min":0,"descripcion":"Un paciente es atendido por cero, uno o muchos médicos."},"lecturas":["Cada PACIENTE es atendido por cero, uno o muchos MÉDICOS.","Cada MÉDICO atiende a cero, uno o muchos PACIENTES."],"instancias":{"titulo":"Las líneas se cruzan: eso es N:M","izquierda":["Ana Torres","Luis Vega","Marta Solís"],"derecha":["Dra. Reyes","Dr. Molina"],"conexiones":[[0,0],[1,0],[1,1],[2,1]]}},"caption":"Luis Vega ve a dos médicos y la Dra. Reyes atiende a dos pacientes: muchos con muchos, las líneas se cruzan."}$j$),
@@ -189,14 +250,16 @@ from public.lessons l,
   (8, 'quiz', $j${"variant":"multiple_choice","prompt":"¿Qué convierte a CITA en una entidad de pleno derecho y no en una simple tabla puente?","options":["Que tiene más de dos columnas","Que tiene atributos propios del negocio: fecha_hora, motivo, estado","Que Oracle la trata distinto","Que su nombre no combina los de las otras dos tablas"],"correctIndex":1,"feedback":{"correct":"Correcto. Cuando la asociación tiene datos propios, la tabla puente se vuelve un concepto real del negocio.","incorrect":"Lo que la eleva son sus atributos propios (fecha, motivo, estado): la asociación en sí lleva información."}}$j$),
   (9, 'resumen', $j${"title":"Resumen — Cardinalidad N:M","points":["N:M: cada instancia de un lado se asocia con muchas del otro, en ambas direcciones.","No puede implementarse con una FK directa: ninguna columna puede guardar muchos valores.","Se descompone en DOS relaciones 1:N mediante una tabla intermedia con dos FKs.","La entidad asociativa suele tener atributos propios y volverse concepto del negocio (CITA).","En los datos, el N:M se reconoce porque AMBAS columnas de FK repiten valores."]}$j$)
 ) as v(ord, kind, payload)
-where l.slug = 'm01-l08-cardinalidad-n-m';
+where c.slug = 'sql-oracle' and l.slug = 'm01-l08-cardinalidad-n-m';
 
 -- ═════════════════════════════════════════════════════════════════════
 -- L09 · Participación y opcionalidad
 -- ═════════════════════════════════════════════════════════════════════
 insert into public.content_blocks (lesson_id, sort_order, kind, payload)
 select l.id, v.ord, v.kind, v.payload::jsonb
-from public.lessons l,
+from public.lessons l
+join public.modules m on m.id = l.module_id
+join public.courses c on c.id = m.course_id,
 (values
   (1, 'texto', $j${"title":"El mínimo también importa","body":"Hasta ahora hablamos del MÁXIMO (¿una o muchas?). Pero toda relación tiene una segunda pregunta: ¿es obligatorio participar? Ese es el MÍNIMO, y solo tiene dos valores: 0 (opcional) o 1 (obligatorio). La cardinalidad completa de un extremo se escribe (mín, máx): un médico atiende (0,N) citas — puede no tener ninguna; una cita es atendida por (1,1) médicos — siempre exactamente uno. Cuando el mínimo es 1 para TODAS las instancias, se dice que la participación es TOTAL; si alguna instancia puede quedarse fuera, es PARCIAL."}$j$),
   (2, 'texto', $j${"title":"Cómo se dibuja y por qué te importa","body":"En pata de gallo, el símbolo EXTERIOR (el más lejano a la entidad) es el mínimo: anillo = 0, barra = 1. En Barker, lo opcional se marca con la mitad discontinua de la línea. ¿Y por qué importa tanto? Porque el mínimo se convierte en decisiones concretas de SQL: participación obligatoria = columna NOT NULL; opcional = columna que acepta NULL. Un error de opcionalidad en el diseño se paga durante años: campos NULL que deberían ser obligatorios o inserciones bloqueadas sin razón. En entrevistas: EXPEDIENTE tiene participación total (todo expediente pertenece a un paciente, sin excepción); MEDICO en atiende es parcial (la recién contratada Dra. Ortiz aún no tiene citas)."}$j$),
@@ -207,14 +270,16 @@ from public.lessons l,
   (7, 'quiz', $j${"variant":"multiple_choice","prompt":"Pregunta de entrevista: ¿en qué se traduce la participación obligatoria al crear la tabla?","options":["En un índice","En una columna NOT NULL","En una tabla adicional","En un trigger"],"correctIndex":1,"feedback":{"correct":"Exacto. Mínimo 1 = la FK no acepta NULL: toda fila debe participar en la relación.","incorrect":"Obligatorio significa que la foreign key será NOT NULL: no puede existir la fila sin esa referencia."}}$j$),
   (8, 'resumen', $j${"title":"Resumen — Participación y opcionalidad","points":["El mínimo de un extremo es 0 (opcional) o 1 (obligatorio); se escribe (mín, máx).","Participación total: todas las instancias participan (mínimo 1). Parcial: alguna puede no hacerlo.","Pata de gallo: símbolo exterior = mínimo (anillo 0, barra 1). Barker: mitad discontinua = opcional.","Obligatorio se traduce a NOT NULL; opcional, a columna que acepta NULL.","EXPEDIENTE participa total en posee; MEDICO participa parcial en atiende (Dra. Ortiz, cero citas)."]}$j$)
 ) as v(ord, kind, payload)
-where l.slug = 'm01-l09-participacion-y-opcionalidad';
+where c.slug = 'sql-oracle' and l.slug = 'm01-l09-participacion-y-opcionalidad';
 
 -- ═════════════════════════════════════════════════════════════════════
 -- L10 · Llaves candidatas y primary key
 -- ═════════════════════════════════════════════════════════════════════
 insert into public.content_blocks (lesson_id, sort_order, kind, payload)
 select l.id, v.ord, v.kind, v.payload::jsonb
-from public.lessons l,
+from public.lessons l
+join public.modules m on m.id = l.module_id
+join public.courses c on c.id = m.course_id,
 (values
   (1, 'texto', $j${"title":"Identificar sin ambigüedad","body":"En un hospital hay dos pacientes llamados Luis Vega. ¿Cómo sabes cuál es cuál? Necesitas atributos que identifiquen a cada instancia SIN ambigüedad. La teoría define una escalera de conceptos: SUPERLLAVE: cualquier conjunto de atributos que identifica de forma única (dni + nombre + teléfono funciona, pero sobra). LLAVE CANDIDATA: una superllave MÍNIMA — si le quitas un atributo, deja de identificar. Una tabla puede tener varias: en PACIENTE, el dni y el email son candidatas. PRIMARY KEY: LA candidata que eliges como identificador oficial. LLAVES ALTERNAS: las candidatas que no elegiste (quedarán como UNIQUE)."}$j$),
   (2, 'texto', $j${"title":"Cómo elegir una buena primary key","body":"Criterios de una PK sana: nunca NULL, nunca cambia (estable), compacta, y sin significado de negocio. Este último sorprende: ¿por qué NO usar el dni? Porque los datos con significado cambian y fallan: hay errores de captura que obligan a corregirlo, pacientes extranjeros sin dni, y regulaciones que prohíben exponerlo. Por eso casi siempre se agrega una llave SUBROGADA (surrogate): un número sin significado generado por la base (paciente_id), y las candidatas naturales quedan como llaves alternas con UNIQUE. El debate llave natural vs subrogada es un clásico de entrevista senior: la respuesta madura es subrogada como PK + UNIQUE sobre la natural."}$j$),
@@ -225,14 +290,16 @@ from public.lessons l,
   (7, 'quiz', $j${"variant":"multiple_choice","prompt":"¿Cuántas primary keys puede tener una tabla?","options":["Una por cada columna única","Máximo dos","Exactamente una (aunque puede estar compuesta por varias columnas)","Ilimitadas"],"correctIndex":2,"feedback":{"correct":"Correcto. UNA sola PK por tabla; si necesita varias columnas, es una PK compuesta — sigue siendo una.","incorrect":"Solo una PK por tabla. Puede abarcar varias columnas (PK compuesta), pero sigue siendo una sola llave."}}$j$),
   (8, 'resumen', $j${"title":"Resumen — Llaves","points":["Superllave: identifica únicamente. Candidata: superllave mínima. PK: la candidata elegida.","Las candidatas no elegidas son llaves alternas y se protegen con UNIQUE.","Una buena PK: nunca NULL, estable, compacta y sin significado de negocio.","Llave subrogada: número artificial generado por la base (paciente_id) — estable por diseño.","Respuesta de entrevista: surrogate como PK + constraint UNIQUE sobre la llave natural (dni)."]}$j$)
 ) as v(ord, kind, payload)
-where l.slug = 'm01-l10-llaves-candidatas-y-pk';
+where c.slug = 'sql-oracle' and l.slug = 'm01-l10-llaves-candidatas-y-pk';
 
 -- ═════════════════════════════════════════════════════════════════════
 -- L11 · El modelo ER del hospital
 -- ═════════════════════════════════════════════════════════════════════
 insert into public.content_blocks (lesson_id, sort_order, kind, payload)
 select l.id, v.ord, v.kind, v.payload::jsonb
-from public.lessons l,
+from public.lessons l
+join public.modules m on m.id = l.module_id
+join public.courses c on c.id = m.course_id,
 (values
   (1, 'texto', $j${"title":"Leer un modelo real, completo","body":"Es hora de juntar todo el módulo en un solo diagrama: el modelo del hospital que nos acompañará el resto del curso. Método para leer cualquier ER (útil en el primer día de un trabajo nuevo y en entrevistas de diseño): 1) identifica las entidades y sus PKs; 2) recorre cada relación leyéndola como frase en ambas direcciones; 3) verifica cardinalidades máximas (¿dónde está la pata de gallo?); 4) verifica los mínimos (¿qué es opcional?); 5) localiza las entidades asociativas que resuelven N:M. Aplícalo al diagrama de abajo antes de responder las preguntas."}$j$),
   (2, 'diagrama', $j${"title":"El hospital completo: 6 entidades, 5 relaciones","component":"ERDiagram","props":{"ancho":580,"alto":440,"entidades":[{"id":"especialidad","nombre":"ESPECIALIDAD","x":20,"y":20,"atributos":[{"nombre":"especialidad_id","pk":true},{"nombre":"nombre"}],"descripcion":"Catálogo de especialidades médicas: Cardiología, Pediatría..."},{"id":"medico","nombre":"MÉDICO","x":20,"y":150,"atributos":[{"nombre":"medico_id","pk":true},{"nombre":"nombre"},{"nombre":"colegiatura"},{"nombre":"especialidad_id","fk":true}],"descripcion":"Personal médico del hospital. Su colegiatura es llave alterna (única)."},{"id":"cita","nombre":"CITA","x":230,"y":150,"atributos":[{"nombre":"cita_id","pk":true},{"nombre":"fecha_hora"},{"nombre":"motivo"},{"nombre":"estado"},{"nombre":"paciente_id","fk":true},{"nombre":"medico_id","fk":true}],"descripcion":"Entidad asociativa que resuelve el N:M entre PACIENTE y MÉDICO, con atributos propios."},{"id":"paciente","nombre":"PACIENTE","x":410,"y":150,"atributos":[{"nombre":"paciente_id","pk":true},{"nombre":"nombre"},{"nombre":"dni"},{"nombre":"fecha_nacimiento"}],"descripcion":"Personas atendidas por el hospital. dni es llave alterna."},{"id":"expediente","nombre":"EXPEDIENTE","x":410,"y":20,"atributos":[{"nombre":"expediente_id","pk":true},{"nombre":"paciente_id","fk":true},{"nombre":"grupo_sanguineo"}],"descripcion":"Historia clínica: relación 1:1 con PACIENTE (su FK será UNIQUE)."},{"id":"estudio","nombre":"ESTUDIO_LAB","x":230,"y":330,"atributos":[{"nombre":"estudio_id","pk":true},{"nombre":"cita_id","fk":true},{"nombre":"tipo"},{"nombre":"resultado"}],"descripcion":"Estudios de laboratorio solicitados durante una cita."}],"relaciones":[{"de":"especialidad","a":"medico","verbo":"agrupa","extremoDe":{"card":"1","min":1},"extremoA":{"card":"N","min":0},"descripcion":"Cada médico tiene una especialidad principal; una especialidad puede no tener médicos aún."},{"de":"medico","a":"cita","verbo":"atiende","extremoDe":{"card":"1","min":1},"extremoA":{"card":"N","min":0},"descripcion":"Un médico atiende muchas citas; toda cita tiene exactamente un médico."},{"de":"paciente","a":"cita","verbo":"agenda","extremoDe":{"card":"1","min":1},"extremoA":{"card":"N","min":0},"descripcion":"Un paciente agenda muchas citas; toda cita pertenece a un paciente."},{"de":"paciente","a":"expediente","verbo":"posee","extremoDe":{"card":"1","min":1},"extremoA":{"card":"1","min":0},"descripcion":"1:1 — cada paciente posee a lo sumo un expediente; todo expediente tiene dueño."},{"de":"cita","a":"estudio","verbo":"genera","extremoDe":{"card":"1","min":1},"extremoA":{"card":"N","min":0},"descripcion":"Una cita puede generar varios estudios de laboratorio."}]},"caption":"Toca cada entidad y cada verbo. Este modelo se convertirá en tablas reales con CREATE TABLE en el módulo 4."}$j$),
@@ -243,16 +310,18 @@ from public.lessons l,
   (7, 'quiz', $j${"variant":"multiple_choice","prompt":"Si se elimina un paciente, ¿qué debería pasar con su expediente? (adelanto del módulo 2)","options":["Nada: quedan expedientes huérfanos","Lo decide la regla de integridad referencial que definas (p. ej. borrado en cascada)","Oracle lo impide siempre","El expediente pasa a otro paciente"],"correctIndex":1,"feedback":{"correct":"Correcto. Eso es integridad referencial: TÚ defines la regla (impedir, poner NULL o borrar en cascada). Módulo 2.","incorrect":"Es una decisión de diseño llamada integridad referencial: impedir el borrado, anular la referencia o borrar en cascada. La verás en el módulo 2."}}$j$),
   (8, 'resumen', $j${"title":"Resumen — El modelo del hospital","points":["Método de lectura: entidades y PKs → relaciones como frases → máximos → mínimos → asociativas.","Seis entidades: PACIENTE, EXPEDIENTE, MÉDICO, ESPECIALIDAD, CITA y ESTUDIO_LAB.","PACIENTE–EXPEDIENTE es 1:1; ESPECIALIDAD–MÉDICO, MÉDICO–CITA, PACIENTE–CITA y CITA–ESTUDIO_LAB son 1:N.","PACIENTE–MÉDICO es N:M, resuelto por la entidad asociativa CITA.","Este modelo se convertirá en tablas Oracle reales en el módulo 4 — y te acompañará todo el curso."]}$j$)
 ) as v(ord, kind, payload)
-where l.slug = 'm01-l11-er-hospital';
+where c.slug = 'sql-oracle' and l.slug = 'm01-l11-er-hospital';
 
 -- ═════════════════════════════════════════════════════════════════════
 -- L12 · Examen de región (jefe del módulo)
 -- ═════════════════════════════════════════════════════════════════════
 insert into public.content_blocks (lesson_id, sort_order, kind, payload)
 select l.id, v.ord, v.kind, v.payload::jsonb
-from public.lessons l,
+from public.lessons l
+join public.modules m on m.id = l.module_id
+join public.courses c on c.id = m.course_id,
 (values
-  (1, 'texto', $j${"title":"El núcleo de la región","body":"Byte llegó al núcleo de la región: trece preguntas guardan el acceso. Todo lo que necesitas ya lo dominas — modelos de datos, entidades, relaciones, tuplas, atributos, dominios, cardinalidades, participación y llaves. Las preguntas que falles volverán al final hasta que las domines. Adelante."}$j$),
+  (1, 'texto', $j${"title":"El núcleo de la región","body":"Byte llegó al núcleo de la región: dieciséis preguntas guardan el acceso. Todo lo que necesitas ya lo dominas — datos e información, los tres niveles del modelo, entidades, relaciones, tuplas, atributos, dominios, cardinalidades, participación y llaves. Las preguntas que falles volverán al final hasta que las domines. Adelante."}$j$),
   (2, 'quiz', $j${"variant":"multiple_choice","prompt":"Un modelo de datos define principalmente:","options":["El hardware del servidor de base de datos","Cómo se estructura, organiza y relaciona la información","El lenguaje de programación del backend","La interfaz de usuario del sistema"],"correctIndex":1,"feedback":{"correct":"Correcto. Estructura y relaciones de la información, independiente de la aplicación.","incorrect":"El modelo de datos es la organización lógica de la información: estructura y relaciones."}}$j$),
   (3, 'quiz', $j${"variant":"multiple_choice","prompt":"¿Qué modelo de datos guarda documentos JSON autocontenidos y en cuál brilla Oracle?","options":["Documental y relacional, respectivamente","Jerárquico y de red, respectivamente","Relacional y documental, respectivamente","De red y jerárquico, respectivamente"],"correctIndex":0,"feedback":{"correct":"Correcto. MongoDB es documental; Oracle es el gran motor relacional.","incorrect":"El documental guarda JSON (MongoDB); Oracle implementa el modelo relacional."}}$j$),
   (4, 'quiz', $j${"variant":"multiple_choice","prompt":"En el hospital: MEDICO, colegiatura y la Dra. Reyes son, respectivamente:","options":["Entidad, atributo e instancia","Atributo, entidad e instancia","Instancia, atributo y entidad","Entidad, instancia y atributo"],"correctIndex":0,"feedback":{"correct":"Correcto. MEDICO es el tipo de entidad, colegiatura la describe, y la Dra. Reyes es una instancia concreta.","incorrect":"MEDICO = entidad (tipo), colegiatura = atributo, Dra. Reyes = instancia."}}$j$),
@@ -265,6 +334,9 @@ from public.lessons l,
   (11, 'quiz', $j${"variant":"multiple_choice","prompt":"Relación, tupla y atributo equivalen, en el vocabulario práctico, a:","options":["Tabla, fila y columna","Fila, tabla y columna","Tabla, columna y fila","Base de datos, tabla y fila"],"correctIndex":0,"feedback":{"correct":"Correcto. Relación = tabla, tupla = fila, atributo = columna. El vocabulario formal y el práctico nombran lo mismo.","incorrect":"El mapa es: relación → tabla, tupla → fila, atributo → columna."}}$j$),
   (12, 'quiz', $j${"variant":"multiple_choice","prompt":"PACIENTE tiene 4 columnas y 3 filas. Formalmente, su grado y su cardinalidad son:","options":["Grado 3 y cardinalidad 4","Grado 4 y cardinalidad 3","Grado 12 y cardinalidad 7","Grado 4 y cardinalidad 4"],"correctIndex":1,"feedback":{"correct":"Correcto. Grado = nº de atributos (4); cardinalidad = nº de tuplas (3). El grado es estructura; la cardinalidad cambia con los datos.","incorrect":"Grado cuenta los atributos (columnas): 4. Cardinalidad cuenta las tuplas (filas): 3."}}$j$),
   (13, 'quiz', $j${"variant":"multiple_choice","prompt":"El conjunto de valores válidos de un atributo — los 8 grupos sanguíneos posibles para grupo_sanguineo — se llama:","options":["Grado","Rango","Dominio","Esquema"],"correctIndex":2,"feedback":{"correct":"Correcto. El dominio define qué valores puede tomar el atributo; todo lo demás debe ser rechazado.","incorrect":"Ese conjunto de valores válidos es el DOMINIO del atributo. El grado cuenta atributos y el esquema es la estructura completa."}}$j$),
-  (14, 'quiz', $j${"variant":"multiple_choice","prompt":"Pregunta final de entrevista: ¿por qué elegir paciente_id (subrogada) como PK en lugar del dni?","options":["Porque los números ocupan menos que el texto","Porque el dni puede cambiar (correcciones), faltar (extranjeros) y exponerlo tiene restricciones — la PK debe ser estable y sin significado","Porque Oracle no acepta PKs de texto","Porque el dni no es único"],"correctIndex":1,"feedback":{"correct":"Impecable. Estabilidad y neutralidad: surrogate como PK, y el dni queda como llave alterna con UNIQUE.","incorrect":"La razón senior: los datos con significado cambian y fallan. PK subrogada estable + UNIQUE sobre el dni."}}$j$)
+  (14, 'quiz', $j${"variant":"multiple_choice","prompt":"Pregunta final de entrevista: ¿por qué elegir paciente_id (subrogada) como PK en lugar del dni?","options":["Porque los números ocupan menos que el texto","Porque el dni puede cambiar (correcciones), faltar (extranjeros) y exponerlo tiene restricciones — la PK debe ser estable y sin significado","Porque Oracle no acepta PKs de texto","Porque el dni no es único"],"correctIndex":1,"feedback":{"correct":"Impecable. Estabilidad y neutralidad: surrogate como PK, y el dni queda como llave alterna con UNIQUE.","incorrect":"La razón senior: los datos con significado cambian y fallan. PK subrogada estable + UNIQUE sobre el dni."}}$j$),
+  (15, 'quiz', $j${"variant":"multiple_choice","prompt":"Un sistema guarda cada cobro de cita individual, y el informe mensual muestra el ingreso promedio por especialidad. En términos técnicos, los cobros guardados y el promedio del informe son, respectivamente:","options":["Información y datos","DATOS (hechos en bruto) e INFORMACIÓN (conocimiento derivado de analizarlos)","Ambos datos","Ambos información"],"correctIndex":1,"feedback":{"correct":"Correcto. La base almacena datos; su propósito es producir información.","incorrect":"Los hechos en bruto (cada cobro) son datos; el conocimiento derivado (el promedio) es información."}}$j$),
+  (16, 'quiz', $j${"variant":"multiple_choice","prompt":"Un documento describe PACIENTE y sus reglas de negocio sin mencionar tecnología alguna; otro lista tablas con columnas VARCHAR2 y NUMBER. ¿Qué niveles del modelo representan?","options":["Lógico y conceptual","CONCEPTUAL ('sin implantación': el negocio) y FÍSICO (la tecnología del motor)","Físico y lógico","Ambos son físicos"],"correctIndex":1,"feedback":{"correct":"Correcto. Sin tecnología = conceptual; con tipos de Oracle = físico. Entre ambos, el lógico formaliza el ERD.","incorrect":"El documento sin tecnología es el CONCEPTUAL; el de VARCHAR2/NUMBER es el FÍSICO (extensión técnica para Oracle)."}}$j$),
+  (17, 'quiz', $j${"variant":"multiple_choice","prompt":"En el cuadro editable de una entidad del ERD lees: # historia_clinica · * nombre · o telefono. La lectura correcta es:","options":["Tres atributos obligatorios","historia_clinica es el UID, nombre es OBLIGATORIO y telefono es OPCIONAL (puede quedar nulo)","historia_clinica es opcional y telefono obligatorio","Los símbolos son decorativos"],"correctIndex":1,"feedback":{"correct":"Correcto. # identifica, * obliga, o acepta el nulo: la notación con la que se lee cualquier ERD del oficio.","incorrect":"El alfabeto del ERD: # marca el identificador único, * los atributos obligatorios y o los opcionales."}}$j$)
 ) as v(ord, kind, payload)
-where l.slug = 'm01-x01-examen';
+where c.slug = 'sql-oracle' and l.slug = 'm01-x01-examen';
