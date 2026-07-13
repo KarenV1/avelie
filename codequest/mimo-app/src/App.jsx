@@ -2,7 +2,7 @@
 // El acceso a CodeQuest requiere sesión: sin ella solo existen
 // Bienvenida (umbral del mundo), Login y Restablecer contraseña.
 import { useEffect, useSyncExternalStore } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { useAuth } from './context/AuthContext.jsx'
 import { subscribeCourses, getCourses, loadRemoteCourses } from './data/courseStore.js'
 import Navbar from './components/layout/Navbar.jsx'
@@ -20,6 +20,20 @@ import Login from './pages/Login.jsx'
 import ResetPassword from './pages/ResetPassword.jsx'
 import ByteMascot from './components/common/ByteMascot.jsx'
 import './components/common/ByteMascot.css'
+
+// Al navegar de una lección a la siguiente, la ruta es la misma y React
+// NO re-monta la pantalla: el estado interno (fase de completado, cola de
+// preguntas, respuestas) sobreviviría al cambio de lección. La key por
+// item fuerza un montaje limpio en cada lección o práctica.
+export function KeyedBlockScreen() {
+  const { courseId, unitId, itemId } = useParams()
+  return <BlockScreen key={`${courseId}/${unitId}/${itemId}`} />
+}
+
+export function KeyedPracticeScreen() {
+  const { courseId, unitId, itemId } = useParams()
+  return <PracticeScreen key={`${courseId}/${unitId}/${itemId}`} />
+}
 
 function AuthLoading() {
   return (
@@ -60,8 +74,8 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/curso/:courseId" element={<CourseScreen />} />
         <Route path="/curso/:courseId/unidad/:unitId" element={<UnitMap />} />
-        <Route path="/curso/:courseId/unidad/:unitId/bloque/:itemId" element={<BlockScreen />} />
-        <Route path="/curso/:courseId/unidad/:unitId/practica/:itemId" element={<PracticeScreen />} />
+        <Route path="/curso/:courseId/unidad/:unitId/bloque/:itemId" element={<KeyedBlockScreen />} />
+        <Route path="/curso/:courseId/unidad/:unitId/practica/:itemId" element={<KeyedPracticeScreen />} />
         <Route path="/perfil" element={<Profile />} />
         <Route path="/ajustes" element={<Settings />} />
         <Route path="/cursos" element={<Cursos />} />
