@@ -1,11 +1,15 @@
 -- ═══════════════════════════════════════════════════════════════════
 -- CodeQuest · Migración 030 — Python desde Cero · Módulo 1: Primeros pasos
 -- ═══════════════════════════════════════════════════════════════════
--- Contenido completo del módulo: 5 lecciones + examen de región.
+-- ⚠️ SUPERSEDIDA POR LA 032 (M1 v2) — NO RE-EJECUTAR ESTA MIGRACIÓN.
+-- Escrita antes del giro a prácticas con Python real en la app: sus
+-- laboratorios apuntan a Google Colab y su contenido explica la
+-- tecnología interna, ambas cosas descartadas. La 032 la reemplaza
+-- por completo (6 lecciones / 41 bloques, lo que hay en producción).
+-- Se conserva solo como registro histórico.
+-- ───────────────────────────────────────────────────────────────────
+-- Contenido original: 5 lecciones + examen de región.
 -- Hilo conductor: la clínica (mismo universo que SQL y Redes).
--- Laboratorios en Google Colab, cero instalación local.
--- El curso sigue is_published = false: nada de esto es visible en la
--- app hasta la migración 037.
 -- Idempotente: borra y recrea las lecciones de ESTE módulo.
 -- Ejecutar DESPUÉS de 008.
 -- ═══════════════════════════════════════════════════════════════════
